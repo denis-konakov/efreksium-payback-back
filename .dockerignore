@@ -1,3 +1,5 @@
 /venv
 /.idea
 /postgres_data
+/secrets
+__pycache__/

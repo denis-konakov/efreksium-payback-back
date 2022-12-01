@@ -14,6 +14,8 @@ services:
       - "80:8000"
     depends_on:
       - base
+    volumes:
+      - ./secrets:/secrets
   base:
     container_name: jpayments_base
     image: "postgres:13"
