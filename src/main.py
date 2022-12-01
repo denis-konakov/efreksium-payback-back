@@ -3,7 +3,9 @@ from db import SessionLocal
 from loguru import logger
 from config import Config
 
-import init_logger
+from db import Base
+import crud.db_models
+Base.metadata.create_all()
 
 app = fastapi.FastAPI()
 

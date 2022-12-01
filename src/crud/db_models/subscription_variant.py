@@ -7,3 +7,4 @@ class SubscriptionVariantDatabaseModel(Base):
     name = q.Column(q.String(128), nullable=False)
     description = q.Column(q.String(256), nullable=False)
     price = q.Column(q.Integer, nullable=False)
+    duration = q.Column(q.Integer, nullable=False)  # in days

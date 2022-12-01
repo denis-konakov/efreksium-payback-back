@@ -5,9 +5,9 @@ from enum import Enum
 
 
 class GroupRole(Enum):
-    OWNER: int
-    MODERATOR: int
-    MEMBER: int
+    OWNER = 2
+    MODERATOR = 1
+    MEMBER = 0
 
 
 class GroupMemberDatabaseModel(Base):

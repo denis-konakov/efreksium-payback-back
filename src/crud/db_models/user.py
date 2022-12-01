@@ -6,6 +6,7 @@ from db import Base
 class UserDatabaseModel(Base):
     __tablename__ = 'users'
     id = q.Column(q.Integer, primary_key=True, index=True)
+    username = q.Column(q.String(128), unique=True, index=True)
     email = q.Column(q.String(128), unique=True)
     number = q.Column(q.String(20), unique=True)
     hashed_password = q.Column(q.String(128), nullable=False)

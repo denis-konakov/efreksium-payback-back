@@ -1,4 +1,6 @@
 import os
+from datetime import timedelta
+
 from loguru import logger
 from typing import TypeVar
 T = TypeVar('T')
@@ -10,6 +12,8 @@ def try_read(path: str, mode: str, default: T) -> T:
         logger.error('File not found: {}', path)
         return default
 class Config:
+    class Settings:
+        TOKEN_EXPIRE_INTERVAL: int | timedelta = timedelta(days=7)
     class DB:
         HOST = os.getenv('POSTGRES_HOST', 'localhost')
         PORT = os.getenv('POSTGRES_PORT', '5432')

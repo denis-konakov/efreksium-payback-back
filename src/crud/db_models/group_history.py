@@ -4,13 +4,13 @@ from sqlalchemy.orm import relationship
 from enum import Enum
 
 class Action(Enum):
-    PAYMENT: int
-    ADD_MEMBER: int
-    REMOVE_MEMBER: int
-    CHANGE_ROLE: int
-    CHANGE_BALANCE: int
-    CHANGE_NAME: int
-    CHANGE_AVATAR: int
+    PAYMENT = 0
+    ADD_MEMBER = 1
+    REMOVE_MEMBER = 2
+    CHANGE_ROLE = 3
+    CHANGE_BALANCE = 4
+    CHANGE_NAME = 5
+    CHANGE_AVATAR = 6
 
 
 class GroupHistoryDatabaseModel(Base):
