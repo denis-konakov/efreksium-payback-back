@@ -1,0 +1,27 @@
+version: "2"
+
+services:
+  backend:
+    container_name: jpayments_backend
+    build: .
+    environment:
+      - POSTGRES_HOST=base
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "80:8000"
+    depends_on:
+      - base
+  base:
+    container_name: jpayments_base
+    image: "postgres:13"
+    restart: always
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - PORT=5432
