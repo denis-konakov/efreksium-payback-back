@@ -32,10 +32,18 @@ class UserCRUD:
             raise UserAlreadyExistsException()
         db.refresh(user)
         return UserPrivate.from_orm(user)
-
+    @classmethod
+    def login(cls,
+              db: Session,
+              data: UserAuthorizationData) -> UserPrivate:
+        user = db.query(UserDatabaseModel).filter(email=data.username).first()
+        if not user:
+            raise UserNotFoundException()
+        if not cls.pwd_context.verify(data.password, user.hashed_password):
+            raise WrongPasswordException()
+        return UserPrivate.from_orm(user)
     @classmethod
     def generate_token(cls,
-                       db: Session,
                        user_id: int,
                        expires_delta: int | timedelta = Config.Settings.TOKEN_EXPIRE_INTERVAL) -> str:
         if isinstance(expires_delta, timedelta):

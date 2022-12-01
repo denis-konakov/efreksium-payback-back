@@ -7,6 +7,9 @@ class UserAlreadyExistsException(AuthorizationException):
 class UserNotFoundException(AuthorizationException):
     pass
 
+class WrongPasswordException(AuthorizationException, ValueError):
+    pass
+
 class InvalidTokenException(AuthorizationException, ValueError):
     pass
 
