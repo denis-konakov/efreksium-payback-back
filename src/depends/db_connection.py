@@ -1,4 +1,5 @@
 from db import SessionLocal
+from sqlalchemy.orm import Session
 def get_db():
     db = SessionLocal()
     try:
@@ -6,6 +7,6 @@ def get_db():
     finally:
         db.close()
 __all__ = (
-    'SessionLocal',
-    'get_db'
+    'get_db',
+    'Session'
 )

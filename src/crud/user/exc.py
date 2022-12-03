@@ -13,6 +13,9 @@ class WrongPasswordException(AuthorizationException, ValueError):
 class InvalidTokenException(AuthorizationException, ValueError):
     pass
 
+class TokenDecodeException(InvalidTokenException):
+    pass
+
 class TokenExpiredException(InvalidTokenException):
     pass
 

@@ -61,7 +61,7 @@ class UserCRUD:
         try:
             payload = JWT.decode(token)
         except jwt.exceptions.DecodeError:
-            raise InvalidTokenException()
+            raise TokenDecodeException()
         except jwt.exceptions.ExpiredSignatureError:
             raise TokenExpiredException()
         user = db.query(UserDatabaseModel).filter_by(id=payload['id']).first()
