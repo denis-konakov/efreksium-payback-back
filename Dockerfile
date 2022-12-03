@@ -8,6 +8,9 @@ RUN python3.10 -m pip install -r requirements.txt
 # copy project
 COPY ./src .
 
+# init secrets
+
+
 # run entrypoint.sh
-COPY ./entrypoint.sh ./entrypoint.sh
+COPY ./sh_scripts .
 CMD ["/bin/bash", "entrypoint.sh"]
