@@ -17,12 +17,14 @@ class UserCRUD:
     @classmethod
     def register(cls,
                  db: Session,
-                 data: UserRegistrationData) -> UserPrivate:
+                 data: UserRegistrationData,
+                 is_active: bool) -> UserPrivate:
         user = UserDatabaseModel(
             username=data.username,
             email=data.email,
             number=data.number,
             hashed_password=cls.pwd_context.hash(data.password),
+            is_active=is_active
         )
         try:
             db.add(user)
@@ -36,8 +38,8 @@ class UserCRUD:
     def login(cls,
               db: Session,
               data: UserAuthorizationData) -> UserPrivate:
-        user = db.query(UserDatabaseModel).filter(email=data.username).first()
-        if not user:
+        user = db.query(UserDatabaseModel).filter_by(email=data.email).first()
+        if user is None:
             raise UserNotFoundException()
         if not cls.pwd_context.verify(data.password, user.hashed_password):
             raise WrongPasswordException()

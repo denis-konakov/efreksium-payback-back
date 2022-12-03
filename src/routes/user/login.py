@@ -6,7 +6,6 @@ from ..response import HTTPResponseModel, TokenModel
 from fastapi.security import OAuth2PasswordRequestForm
 @router.post(
     '/login',
-    response_model=UserPublic,
     summary='Авторизация пользователя в системе',
     responses={
         200: {'description': 'Авторизация прошла успешно', 'model': TokenModel},
@@ -17,11 +16,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 def login(form: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)) -> TokenModel:
     try:
-        user = UserCRUD.login(db, UserAuthorizationData(username=form.username, password=form.password))
+        user = UserCRUD.login(db, UserAuthorizationData(email=form.username, password=form.password))
         if not user.is_active:
             raise HTTPException(status_code=403, detail='User is not active')
         token = UserCRUD.generate_token(user.id)
-        return TokenModel(token=token)
+        return TokenModel(access_token=token)
     except AuthorizationException:
         raise HTTPException(
             status_code=401, detail="Incorrect username or password"

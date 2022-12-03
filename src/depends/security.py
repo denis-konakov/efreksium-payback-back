@@ -4,7 +4,7 @@ from .db_connection import get_db, Session
 from crud import UserCRUD, UserPrivate, TokenDecodeException, TokenExpiredException, UserNotFoundException
 from routes.response import HTTPResponseModel
 
-oauth2scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
+oauth2scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
 
 def get_current_user(token: str = Depends(oauth2scheme),
