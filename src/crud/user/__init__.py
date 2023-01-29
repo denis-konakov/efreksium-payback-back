@@ -9,11 +9,11 @@ from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 from config import Config
 from time import time
+from ..err_proxy import CRUDBase
 import jwt
 
-class UserCRUD:
+class UserCRUD(CRUDBase):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
     @classmethod
     def register(cls,
                  db: Session,
@@ -68,5 +68,11 @@ class UserCRUD:
             raise TokenExpiredException()
         user = db.query(UserDatabaseModel).filter_by(id=payload['id']).first()
         if not user:
+            raise UserNotFoundException()
+        return UserPrivate.from_orm(user)
+    @classmethod
+    def get_user_by_email(cls, db: Session, email: EmailStr) -> UserPrivate:
+        user = db.query(UserDatabaseModel).filter_by(email=email).first()
+        if user is None:
             raise UserNotFoundException()
         return UserPrivate.from_orm(user)

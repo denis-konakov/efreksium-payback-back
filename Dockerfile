@@ -1,9 +1,9 @@
-FROM python:3.10
+FROM python:3.11
 
 WORKDIR /app
 # install dependencies
 COPY requirements.txt requirements.txt
-RUN python3.10 -m pip install -r requirements.txt
+RUN python3.11 -m pip install -r requirements.txt
 
 # copy project
 COPY ./src .

@@ -5,6 +5,7 @@ from . import router
 
 @router.get(
     '/profile',
+    summary="Получение данных о пользователе",
     responses={
         **get_current_user.responses,
         200: {

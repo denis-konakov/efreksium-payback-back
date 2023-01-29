@@ -10,8 +10,6 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - "80:8000"
     depends_on:
       - base
     volumes:
@@ -28,12 +26,20 @@ services:
       - POSTGRES_DB=postgres
       - PORT=5432
   pgweb:
-    container_name: pgweb
+    container_name: jpayments_pgweb
     image: sosedoff/pgweb
     restart: always
-    ports:
-      - "8081:8081"
     environment:
         - PGWEB_DB_URL=postgres://postgres:postgres@base:5432/postgres
     depends_on:
       - base
+  nginx:
+    container_name: jpayments_nginx
+    image: nginx:1.23.2
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend

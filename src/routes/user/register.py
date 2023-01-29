@@ -14,6 +14,9 @@ def register(data: UserRegistrationData,
              db: Session = Depends(get_db)) -> UserPublic:
     try:
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
+        if Config.Email.ENABLED:
+            pass
         return UserPublic.from_orm(user)
     except UserAlreadyExistsException:
+        user = UserCRUD.get
         raise HTTPException(status_code=400, detail='User already exists')
