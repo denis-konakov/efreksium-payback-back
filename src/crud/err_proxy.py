@@ -1,3 +1,4 @@
+from typing import Self
 class ErrorHandleProxy:
     def __init__(self, obj):
         self.__value = obj
@@ -12,5 +13,5 @@ class ErrorHandleProxy:
 
 class CRUDBase:
     @classmethod
-    def handled(cls):
+    def handled(cls) -> Self:
         return ErrorHandleProxy(cls)
