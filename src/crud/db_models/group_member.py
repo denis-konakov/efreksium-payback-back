@@ -1,13 +1,13 @@
 from db import Base
 import sqlalchemy as q
 from sqlalchemy.orm import relationship
-from enum import Enum
+from enum import StrEnum
 
 
-class GroupRole(Enum):
-    OWNER = 2
-    MODERATOR = 1
-    MEMBER = 0
+class GroupRole(StrEnum):
+    OWNER = 'owner'
+    MODERATOR = 'moder'
+    MEMBER = 'member'
 
 
 class GroupMemberDatabaseModel(Base):

@@ -2,10 +2,10 @@ import sqlalchemy as q
 from sqlalchemy.orm import relationship
 from db import Base
 import enum
-class ConfirmationVariant(enum.IntEnum):
-    NONE = enum.auto()
-    REGISTRATION = enum.auto()
-    PASSWORD_RESET = enum.auto()
+class ConfirmationVariant(enum.StrEnum):
+    NONE = 'none'
+    REGISTRATION = 'registration'
+    RESET_PASSWORD = 'reset_password'
 
 class UserDatabaseModel(Base):
     __tablename__ = 'users'
