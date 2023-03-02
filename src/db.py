@@ -12,7 +12,7 @@ while True:
         engine.connect()
         break
     except Exception as e:  # noqa
-        logger.error('Database is not ready yet, retrying in 5 seconds ({})', e)
+        logger.error('Database is not ready yet, retrying in 5 seconds\n{}', e)
         time.sleep(5)
 logger.info('Database is ready')
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

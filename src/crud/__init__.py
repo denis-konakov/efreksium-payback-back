@@ -1,4 +1,4 @@
-from .user.models import UserPublic, UserPrivate, UserAuthorizationData, UserRegistrationData
+from .user.models import UserPublic, UserPrivate, UserAuthorizationForm, UserRegistrationForm
 from .subscription.models import SubscriptionInfo, SubscriptionVariant, SubscriptionVariantFull
 from .group.models import Group, GroupMember, GroupHistoryEntry
 deps = {

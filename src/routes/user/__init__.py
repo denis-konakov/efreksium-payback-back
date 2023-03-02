@@ -5,3 +5,6 @@ router = APIRouter(prefix='/user', tags=['user'])
 from . import login
 from . import profile
 from . import register
+from . import confirm_email
+from . import send_confirm_code
+from . import change_password

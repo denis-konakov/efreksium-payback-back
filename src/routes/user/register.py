@@ -1,22 +1,54 @@
 from . import router
-from fastapi import HTTPException
-from crud import UserRegistrationData, UserCRUD, UserPublic, UserAlreadyExistsException
-from depends import get_db, Session, Depends
+from fastapi import Request
+from depends import get_db, Session, Depends, get_mail, MailManager
 from config import Config
-from ..response import HTTPResponseModel
-@router.post('/register',
-             summary='Регистрация пользователя',
-             responses={
-                200: {'description': 'Регистрация прошла успешно', 'model': UserPublic},
-                400: {'description': 'Пользователь с таким именем уже существует', 'model': HTTPResponseModel}
-             })
-def register(data: UserRegistrationData,
-             db: Session = Depends(get_db)) -> UserPublic:
+from utils.throws import throws
+from crud import (
+    UserRegistrationForm,
+    UserCRUD,
+    UserPublic,
+    UserAlreadyExistsException,
+    UserNotFoundException,
+    UserNotActiveException,
+    cv,
+)
+@router.post(
+    '/register',
+     summary='Регистрация пользователя',
+     responses={
+         **throws.docs([
+             UserCRUD.register,
+             UserCRUD.generate_confirmation_code,
+             UserNotFoundException,
+             UserAlreadyExistsException,
+             UserNotActiveException
+         ]),
+         200: {
+             'description': 'Регистрация прошла успешно',
+             'model': UserPublic
+         },
+     }
+)
+def register(request: Request,
+             data: UserRegistrationForm,
+             db: Session = Depends(get_db),
+             mail: MailManager = Depends(get_mail)) -> UserPublic:
     try:
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
         if Config.Email.ENABLED:
-            pass
+            code = UserCRUD.generate_confirmation_code(db, user.id, cv.REGISTRATION)
+            confirm_link = request.url_for('confirm_user', code=code)
+            mail.send_confirmation(user.email, confirm_link, user)
         return UserPublic.from_orm(user)
     except UserAlreadyExistsException:
-        user = UserCRUD.get
-        raise HTTPException(status_code=400, detail='User already exists')
+        ctx = UserCRUD.ctx()
+        user = UserCRUD.handled(ctx).get_user_by_registration_data(db, data)
+        if ctx.has(UserNotFoundException):
+            raise UserNotFoundException.get()
+        if user.is_active:
+            raise UserAlreadyExistsException.get()
+        raise UserNotActiveException.get()
+
+
+
+

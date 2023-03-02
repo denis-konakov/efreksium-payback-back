@@ -3,3 +3,4 @@
 /postgres_data
 /secrets
 __pycache__/
+/smtp4dev-data

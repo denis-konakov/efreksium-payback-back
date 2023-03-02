@@ -1,29 +1,32 @@
 from . import router
 from depends import get_db, Depends, Session
-from crud import UserAuthorizationData, UserPublic, UserCRUD, AuthorizationException
-from fastapi import Response, HTTPException
-from ..response import HTTPResponseModel, TokenModel
+from crud import UserAuthorizationForm, UserCRUD, AuthorizationException, UserNotActiveException, WrongPasswordException
+from utils.response import HTTPResponseModel, TokenModel
 from fastapi.security import OAuth2PasswordRequestForm
+from utils.throws import throws
 @router.post(
     '/login',
     summary='Авторизация пользователя в системе',
     responses={
-        200: {'description': 'Авторизация прошла успешно', 'model': TokenModel},
-        401: {'description': 'Неверный логин или пароль', 'model': HTTPResponseModel},
-        403: {'description': 'Пользователь не подтвердил почту', 'model': HTTPResponseModel},
+        **throws.docs([
+            UserCRUD.login,
+            UserCRUD.generate_token
+        ]),
+        200: {
+            'description': 'Авторизация прошла успешно',
+            'model': TokenModel
+        },
     }
 )
 def login(form: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)) -> TokenModel:
     try:
-        user = UserCRUD.login(db, UserAuthorizationData(email=form.username, password=form.password))
+        user = UserCRUD.login(db, UserAuthorizationForm(email=form.username, password=form.password))
         if not user.is_active:
-            raise HTTPException(status_code=403, detail='User is not active')
+            raise UserNotActiveException.get()
         token = UserCRUD.generate_token(user.id)
         return TokenModel(access_token=token)
-    except AuthorizationException:
-        raise HTTPException(
-            status_code=401, detail="Incorrect username or password"
-        )
+    except AuthorizationException as e:
+        raise e.get()
 
 

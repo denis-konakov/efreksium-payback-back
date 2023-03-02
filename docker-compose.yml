@@ -10,9 +10,17 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - EMAIL_ENABLED=True
+      - EMAIL_SERVER=smtp4dev
+      - EMAIL_PORT=25
+      - EMAIL_FROM=noreply@smtp4dev.lan
+      - EMAIL_FROM_NAME=oreply@smtp4dev.lan
+      - EMAIL_PASSWORD=noreply
+      - EMAIL_TEMPLATES_DIR=/email_templates
     depends_on:
       - base
     volumes:
+      - ./email_templates:/email_templates
       - ./secrets:/secrets
   base:
     container_name: jpayments_base
@@ -40,6 +48,15 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template
     depends_on:
       - backend
+    environment:
+      - PROXY_HOST=localhost
+  smtp4dev:
+    container_name: jpayments_smtp4dev
+    image: rnwood/smtp4dev
+    volumes:
+        - ./smtp4dev-data:/smtp4dev
+    ports:
+      - "1337:80"
