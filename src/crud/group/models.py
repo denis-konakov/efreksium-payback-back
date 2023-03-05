@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from ..db_models.group_member import GroupRole
-from ..db_models.group_history import Action
+from ..db_models.group_history import GroupAction
 class Group(BaseModel):
     id: int
     name: str
@@ -25,6 +25,6 @@ class GroupHistoryEntry(BaseModel):
     group: Group
     user_id: int
     user: 'UserPublic'
-    action: Action
+    action: GroupAction
     action_description: dict[str, str]
     time: datetime

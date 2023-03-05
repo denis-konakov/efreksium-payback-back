@@ -1,16 +1,16 @@
 from db import Base
 import sqlalchemy as q
 from sqlalchemy.orm import relationship
-from enum import Enum
+from enum import StrEnum
 
-class Action(Enum):
-    PAYMENT = 0
-    ADD_MEMBER = 1
-    REMOVE_MEMBER = 2
-    CHANGE_ROLE = 3
-    CHANGE_BALANCE = 4
-    CHANGE_NAME = 5
-    CHANGE_AVATAR = 6
+class GroupAction(StrEnum):
+    PAYMENT = 'payment'
+    ADD_MEMBER = 'add_member'
+    REMOVE_MEMBER = 'remove_member'
+    CHANGE_ROLE = 'change_role'
+    CHANGE_BALANCE = 'change_balance'
+    CHANGE_NAME = 'change_name'
+    CHANGE_AVATAR = 'change_avatar'
 
 
 class GroupHistoryDatabaseModel(Base):
@@ -20,6 +20,6 @@ class GroupHistoryDatabaseModel(Base):
     group = relationship('GroupDatabaseModel', backref='history')
     user_id = q.Column(q.Integer, q.ForeignKey('users.id'))
     user = relationship('UserDatabaseModel', backref='group_history')
-    action = q.Column(q.Enum(Action), default=Action.PAYMENT)
+    action = q.Column(q.Enum(GroupAction), default=GroupAction.PAYMENT)
     action_description = q.Column(q.JSON, nullable=False)
     time = q.Column(q.DateTime, nullable=False, server_default=q.func.now())

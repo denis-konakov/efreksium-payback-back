@@ -1,23 +1,30 @@
 from pydantic import BaseModel, Field
 from config import Config
-from typing import Callable
+from typing import Callable, TypeVar, Generic
 from fastapi import HTTPException
+from pydantic.generics import GenericModel
 
 
-class HTTPResponseDetails(BaseModel):
-    details: str = Field(..., title='Текстовый код ответа')
-    program_code: str = Field(..., title='Программный код ответа')
-class HTTPResponseModel(BaseModel):
-    details: HTTPResponseDetails = Field(..., title='Детали ответа')
+T = TypeVar('T')
+class HTTPResponseDetail(GenericModel, Generic[T]):
+    response: T = Field(title='Данные ответа')
+    detail: str = Field(title='Текстовый код ответа')
+    program_code: str = Field(title='Программный код ответа')
+    status: bool = Field(title='Статус выполнения запроса')
+
+class HTTPResponseModel(GenericModel, Generic[T]):
+    detail: HTTPResponseDetail[T] = Field(title='Детали ответа')
     @classmethod
-    def success(cls, details: str) -> tuple[dict[int, dict], 'HTTPResponseModel']:
-        return {200: {
-            'description': f'{details} (Программный код success)',
-            'model': HTTPResponseModel,
-        }}, cls(details={
-            'details': details,
-            'program_code': 'success'
-        })
+    def success(cls, detail: str, response: type = None, *, program_code: str = 'success') -> 'type[ResponseException]':
+        class SuccessResponse(ResponseException):
+            META = dict(
+                status_code=200,
+                program_code=program_code,
+                detail=detail,
+                status=True,
+                response=response
+            )
+        return SuccessResponse
 class TokenModel(BaseModel):
     access_token: str = Field(..., title='Токен доступа')
     expire: int = Field(Config.Settings.TOKEN_EXPIRE_INTERVAL, title='Время жизни токена')
@@ -44,26 +51,31 @@ MetaDataDictType = dict[str,
 class ResponseException(Exception):
     BASE_META: MetaDataDictType = dict(
         status_code=500,
-        details='Internal server error',
-        program_code=lambda cls: _camel_to_snake(_search_parent_has_meta(cls).__name__)
+        detail='Internal server error',
+        program_code=lambda cls: _camel_to_snake(_search_parent_has_meta(cls).__name__),
+        status=False,
     )
     META: MetaDataDictType = dict()
     @classmethod
     def get_meta(cls, **kwargs: MetaDataDictType) -> dict[str, str | int]:
         meta = {**cls.BASE_META, **cls.META, **kwargs}
         for i in meta.keys():
-            if callable(meta.get(i)):
+            if callable(meta.get(i)) and meta.get(i).__class__.__name__ == 'function':
                 meta[i] = meta[i](cls)
         return meta
     @classmethod
     def status_code(cls) -> int:
         return int(cls.get_meta().get('status_code', 500))
     @classmethod
-    def details(cls):
-        return cls.get_meta().get('details', '')
+    def detail(cls):
+        return cls.get_meta().get('detail', '')
     @classmethod
     def program_code(cls):
         return cls.get_meta().get('program_code', '')
+
+    @classmethod
+    def status(cls):
+        return cls.get_meta().get('status', False)
     @classmethod
     def get(cls, **kwargs: MetaDataDictType):
         return HTTPException(
@@ -71,10 +83,23 @@ class ResponseException(Exception):
             detail=cls.get_meta(**kwargs)
         )
     @classmethod
-    def docs(cls):
+    def response(cls, response=None, **kwargs: MetaDataDictType):
         return {
-            'description': f'{cls.details()} (Программный код: {cls.program_code()})',
-            'model': HTTPResponseModel,
+            'detail': cls.get_meta(**{**kwargs, 'response': response}),
+        }
+    @classmethod
+    def example(cls):
+
+        return {
+            'summary': cls.detail(),
+            'value': {
+                'detail': {
+                    'detail': cls.detail(),
+                    'program_code': cls.program_code(),
+                    'status': cls.status(),
+                    'response': None
+                }
+            }
         }
     @classmethod
     def raise_(cls, **kwargs):

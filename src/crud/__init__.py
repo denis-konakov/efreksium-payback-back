@@ -1,3 +1,4 @@
+from .exceptions import *
 from .user.models import UserPublic, UserPrivate, UserAuthorizationForm, UserRegistrationForm
 from .subscription.models import SubscriptionInfo, SubscriptionVariant, SubscriptionVariantFull
 from .group.models import Group, GroupMember, GroupHistoryEntry
@@ -11,4 +12,5 @@ GroupMember.update_forward_refs(**deps)
 GroupHistoryEntry.update_forward_refs(**deps)
 
 from .user import *
+from .friends import *
 

@@ -4,7 +4,7 @@ from .group_member import GroupMemberDatabaseModel
 from .user import UserDatabaseModel, ConfirmationVariant
 from .subscription import SubscriptionDatabaseModel
 from .subscription_variant import SubscriptionVariantDatabaseModel
-
+from .friend import FriendDatabaseModel
 __all__ = (
     'GroupDatabaseModel',
     'GroupHistoryDatabaseModel',
@@ -12,5 +12,6 @@ __all__ = (
     'UserDatabaseModel',
     'SubscriptionDatabaseModel',
     'SubscriptionVariantDatabaseModel',
-    'ConfirmationVariant'
+    'ConfirmationVariant',
+    'FriendDatabaseModel',
 )

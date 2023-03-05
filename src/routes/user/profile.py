@@ -3,18 +3,20 @@ from depends import get_current_user
 from crud import UserPublic, UserPrivate
 from . import router
 from utils.throws import throws
+from utils import HTTPResponseModel
+resp = HTTPResponseModel.success(
+    'Получение данных пользователя',
+    UserPublic
+)
 @router.get(
     '/profile',
     summary="Получение данных о пользователе",
     responses={
         **throws.docs([
-            get_current_user
+            get_current_user,
+            resp
         ]),
-        200: {
-            'description': 'Получение данных пользователя',
-            'model': UserPublic
-        },
     }
 )
 def profile(user: UserPrivate = Depends(get_current_user)) -> UserPublic:
-    return UserPublic.from_orm(user)
+    return resp.response(response=UserPublic.from_orm(user))

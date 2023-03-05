@@ -4,7 +4,7 @@ from .jwt import JWT
 from sqlalchemy.orm import Session
 from .models import *
 from passlib.context import CryptContext
-from .exc import *
+from ..exceptions import *
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 from config import Config
@@ -14,9 +14,9 @@ import jwt
 from secrets import token_bytes
 import base64
 from binascii import Error as BinasciiError
-from loguru import logger
 from utils.throws import throws
 class UserCRUD(CRUDBase):
+    cv = cv
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     @classmethod
     @throws([UserNotFoundException])
@@ -101,8 +101,8 @@ class UserCRUD(CRUDBase):
         return UserPrivate.from_orm(user)
     @classmethod
     @throws([UserNotFoundException])
-    def get_user_by_username(cls, db: Session, username: str) -> UserPrivate:
-        user = db.query(UserDatabaseModel).filter_by(username=username).first()
+    def get_user_by_id(cls, db: Session, user_id: int) -> UserPrivate:
+        user = db.query(UserDatabaseModel).filter_by(id=user_id).first()
         if user is None:
             raise UserNotFoundException()
         return UserPrivate.from_orm(user)

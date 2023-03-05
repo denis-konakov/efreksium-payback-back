@@ -1,6 +1,5 @@
 from db import Base
 import sqlalchemy as q
-from sqlalchemy.orm import relationship
 
 class GroupDatabaseModel(Base):
     __tablename__ = 'groups'

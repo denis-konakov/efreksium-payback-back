@@ -1,5 +1,5 @@
 from typing import Iterable, Callable, Type
-from .response import ResponseException
+from .response import ResponseException, HTTPResponseModel
 from functools import update_wrapper
 from contextlib import contextmanager
 import inspect
@@ -58,9 +58,22 @@ class ThrowsManager:
     @classmethod
     def docs(cls, exceptions: ThrowsExceptionsList) -> dict[int, dict]:
         exceptions = cls.join(exceptions)
-        return {
-            i.status_code(): i.docs() for i in exceptions
-        }
+        r = {}
+        for i in exceptions:
+            if i.status_code() not in r:
+                if i.META.get('response', None) is not None:
+                    r[i.status_code()] = {
+                        'description': i.detail(),
+                        'model': HTTPResponseModel[i.META.get('response')]
+                    }
+                    continue
+                r[i.status_code()] = {
+                    'description': f'Ответ с кодом {i.status_code()}',
+                    'content': {'application/json': {'examples': {}}},
+                    'model': HTTPResponseModel[type(None)],
+                }
+            r[i.status_code()]['content']['application/json']['examples'][i.detail()] = i.example()
+        return r
 
     def __call__(self, exceptions: ThrowsExceptionsList | Callable | None = None):
         if callable(exceptions):

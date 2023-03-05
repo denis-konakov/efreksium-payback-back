@@ -5,19 +5,17 @@ from crud.user.models import UserPublic
 from crud import UserCRUD, cv
 from depends import Session, Depends, get_db
 from utils.response import ResponseException
-from utils.throws import throws
+from utils import throws, HTTPResponseModel
+resp = HTTPResponseModel.success('Подтверждение прошло успешно', UserPublic)
 
 @router.post(
     '/confirm_email/{code}',
     summary='Подтверждение почты',
     responses={
         **throws.docs([
-            UserCRUD.confirm_user
+            UserCRUD.confirm_user,
+            resp,
         ]),
-        200: {
-            'description': 'Подтверждение прошло успешно',
-            'model': UserPublic
-        }
     }
 )
 def confirm_email(
@@ -29,6 +27,6 @@ def confirm_email(
     except ResponseException as e:
         raise e.get()
 
-    return UserPublic.from_orm(user)
+    return resp.response(UserPublic.from_orm(user))
 
 

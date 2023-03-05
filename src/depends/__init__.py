@@ -5,3 +5,4 @@ ResponsesListType = dict[int, dict]
 from .db_connection import *
 from .security import *
 from .mail import *
+from .confirm_link import *
