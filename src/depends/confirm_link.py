@@ -1,11 +1,29 @@
 from utils import throws
-from fastapi import Request
+from enum import StrEnum
+from fastapi import Request, Depends, Query
+from pydantic import AnyHttpUrl
+from utils import url_add_arguments
+from crud import PublicPrivateCodePair
 from typing import Callable
-@throws
-def get_confirm_link(request: Request):
-    def wraps(code: str) -> str:
-        return request.url_for('confirm_email', code=code)
-    return wraps
 
-get_confirm_link_type = Callable[[str], str]
+class ConfirmLinkVariant(StrEnum):
+    CONFIRM_EMAIL = 'confirm_email'
+    RESET_PASSWORD = 'reset_password'
 
+
+@throws([
+
+])
+class ConfirmLink:
+    def __init__(self):
+        self.type = Callable[[str | PublicPrivateCodePair], str]
+    def __call__(self, redirect: AnyHttpUrl = Query(title='Ссылка для перенаправления авторизации')):
+        def wraps(code: str | PublicPrivateCodePair) -> str:
+            if isinstance(code, PublicPrivateCodePair):
+                code = code.private
+            return url_add_arguments(redirect, {
+                'confirm_code': code
+            })
+        return wraps
+
+confirm = ConfirmLink()

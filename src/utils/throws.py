@@ -1,13 +1,14 @@
-from typing import Iterable, Callable, Type
+from typing import Iterable, Callable, Type, TypeVar, Generic, Any
 from .response import ResponseException, HTTPResponseModel
-from functools import update_wrapper
-from contextlib import contextmanager
+from functools import update_wrapper, lru_cache
+from contextlib import contextmanager, AbstractContextManager
 import inspect
+from fastapi import Depends
 
 
 class ThrowableFunction:
     def __init__(self, f: Callable):
-        self._function: Callable = f
+        self._function = f
         self._exceptions: list[ResponseException] = []
         update_wrapper(self, f)
 
@@ -19,6 +20,7 @@ class ThrowableFunction:
 
     def exceptions(self):
         return self._exceptions[:]
+
     def __getattr__(self, item):
         return getattr(self._function, item)
 
@@ -26,8 +28,9 @@ class ThrowableFunction:
 class ThrowableContextManager(ThrowableFunction):
     def __init__(self, f: Callable):
         super().__init__(contextmanager(f))
+
     def __call__(self, *args, **kwargs):
-        with self._function() as t:
+        with self._function(*args, **kwargs) as t:
             yield t
 
 
@@ -40,7 +43,7 @@ class ThrowsManager:
         pass
 
     @classmethod
-    def get_base(cls, t: Callable):
+    def get_base(cls, t: Callable) -> Type[ThrowableFunction] | Type[ThrowableContextManager]:
         if inspect.isgeneratorfunction(t):
             return ThrowableContextManager
         return ThrowableFunction
@@ -75,14 +78,16 @@ class ThrowsManager:
             r[i.status_code()]['content']['application/json']['examples'][i.detail()] = i.example()
         return r
 
-    def __call__(self, exceptions: ThrowsExceptionsList | Callable | None = None):
+    def __call__(self,
+                 exceptions: ThrowsExceptionsList | Callable | None = None) -> ThrowableFunction | Callable[
+        [...], ThrowableFunction]:
         if callable(exceptions):
             return self.get_base(exceptions)(exceptions)
         if exceptions is None:
             exceptions = []
         r = self.join(exceptions)
 
-        def wrapper(f):
+        def wrapper(f: Callable[[], Any]):
             class Wrapper(self.get_base(f)):
                 def __init__(self, func: Callable):
                     super().__init__(func)

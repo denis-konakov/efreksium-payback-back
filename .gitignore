@@ -2,5 +2,6 @@
 /.idea
 /postgres_data
 /secrets
-__pycache__/
+**/__pycache__/
 /smtp4dev-data
+tests.ipynb

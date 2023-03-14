@@ -47,7 +47,7 @@ class MailManager:
         self.send(
             to,
             'Подтверждение почты',
-            'confirm_user.html',
+            'confirm_email.html',
             {
                 'confirm_link': link,
                 'user': user

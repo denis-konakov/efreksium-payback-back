@@ -3,7 +3,8 @@ from . import router
 from fastapi import Request
 from depends import get_db, Session, Depends, get_mail, MailManager
 from config import Config
-from utils.throws import throws
+from depends import confirm
+from utils import throws, url_add_arguments
 from crud import (
     UserRegistrationForm,
     UserCRUD,
@@ -11,8 +12,8 @@ from crud import (
     UserAlreadyExistsException,
     UserNotFoundException,
     UserNotActiveException,
-    cv,
 )
+from pydantic import AnyHttpUrl
 from config import Config
 resp = HTTPResponseModel.success(
     'Код подтверждения почты отправлен' if Config.Email.ENABLED else
@@ -25,7 +26,7 @@ resp = HTTPResponseModel.success(
      responses={
          **throws.docs([
              UserCRUD.register,
-             UserCRUD.generate_confirmation_code,
+             UserCRUD.generate_email_confirmation_code,
              UserNotFoundException,
              UserAlreadyExistsException,
              UserNotActiveException,
@@ -33,23 +34,22 @@ resp = HTTPResponseModel.success(
          ]),
      }
 )
-def register(request: Request,
-             data: UserRegistrationForm,
+def register(data: UserRegistrationForm,
+             link: confirm.type = Depends(confirm),
              db: Session = Depends(get_db),
              mail: MailManager = Depends(get_mail)):
     try:
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
         if Config.Email.ENABLED:
-            code = UserCRUD.generate_confirmation_code(db, user.id, cv.REGISTRATION)
-            confirm_link = request.url_for('confirm_email', code=code)
-            mail.send_confirmation(user.email, confirm_link, user)
+            code = UserCRUD.generate_email_confirmation_code(user)
+            mail.send_confirmation(user.email, link(code.private), user)
         return resp.response()
     except UserAlreadyExistsException:
         ctx = UserCRUD.ctx()
-        user = UserCRUD.handled(ctx).get_user_by_registration_data(db, data)
+        user = UserCRUD.handled(ctx).get(db, email=data.email)
         if ctx.has(UserNotFoundException):
             raise UserNotFoundException.get()
-        if user.is_active:
+        if user.email_confirmed:
             raise UserAlreadyExistsException.get()
         raise UserNotActiveException.get()
 

@@ -2,7 +2,9 @@ from db import SessionLocal
 from sqlalchemy.orm import Session
 from utils.throws import throws
 
-@throws
+@throws([
+
+])
 def get_db() -> Session:
     db = SessionLocal()
     try:

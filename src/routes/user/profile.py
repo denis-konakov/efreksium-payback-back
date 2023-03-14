@@ -1,6 +1,6 @@
 from fastapi import Depends
 from depends import get_current_user
-from crud import UserPublic, UserPrivate
+from crud import UserPublic, UserDatabaseModel
 from . import router
 from utils.throws import throws
 from utils import HTTPResponseModel
@@ -18,5 +18,7 @@ resp = HTTPResponseModel.success(
         ]),
     }
 )
-def profile(user: UserPrivate = Depends(get_current_user)) -> UserPublic:
-    return resp.response(response=UserPublic.from_orm(user))
+def profile(user: UserDatabaseModel = Depends(get_current_user)) -> UserPublic:
+    return resp.response(
+        UserPublic.from_orm(user)
+    )

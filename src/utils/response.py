@@ -48,7 +48,8 @@ MetaDataDictType = dict[str,
                         int |
                         Callable[[type], str | int]
 ]
-class ResponseException(Exception):
+T2 = TypeVar('T2')
+class ResponseException(Exception, Generic[T2]):
     BASE_META: MetaDataDictType = dict(
         status_code=500,
         detail='Internal server error',
@@ -83,13 +84,12 @@ class ResponseException(Exception):
             detail=cls.get_meta(**kwargs)
         )
     @classmethod
-    def response(cls, response=None, **kwargs: MetaDataDictType):
-        return {
+    def response(cls, response: T2 = None, **kwargs: MetaDataDictType) -> HTTPResponseModel[T2] | T2:
+        return HTTPResponseModel[T2](**{
             'detail': cls.get_meta(**{**kwargs, 'response': response}),
-        }
+        })
     @classmethod
     def example(cls):
-
         return {
             'summary': cls.detail(),
             'value': {

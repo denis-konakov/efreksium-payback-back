@@ -1,7 +1,8 @@
 import re
+from .base import AbstractTypeBase
 _phone_regex = re.compile(r'^(\+7|8)?[0-9]{10}$')
 
-class PhoneNumber(str):
+class PhoneNumber(str, AbstractTypeBase):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -9,7 +10,7 @@ class PhoneNumber(str):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(
-            pattern=r'^(\+7|8)?[0-9]{10}$',
+            pattern=_phone_regex.pattern,
         )
 
     @classmethod
@@ -21,5 +22,5 @@ class PhoneNumber(str):
         return cls(v)
 
     def __repr__(self):
-        return f'PhoneNumber<{self}>'
+        return f'<{self.__class__.__name__} ({self})>'
         

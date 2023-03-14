@@ -1,9 +1,9 @@
 import re
+from .base import AbstractTypeBase
+_username_regex = re.compile(r'^[a-zA-Zа-яА-Я0-9 _-]{3,32}$')
 
-_username_regex = re.compile(r'^[a-zA-Zа-яА-Я0-9 _-]$')
 
-
-class Username(str):
+class Username(str, AbstractTypeBase):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -22,3 +22,6 @@ class Username(str):
         if not _username_regex.match(v):
             raise TypeError('Invalid username')
         return cls(v)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} ({self})>'

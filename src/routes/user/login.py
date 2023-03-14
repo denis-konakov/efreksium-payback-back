@@ -4,27 +4,26 @@ from crud import UserAuthorizationForm, UserCRUD, AuthorizationException, UserNo
 from utils.response import HTTPResponseModel, TokenModel
 from utils.throws import throws
 from fastapi.security import OAuth2PasswordRequestForm
+
 resp = HTTPResponseModel.success('Авторизация прошла успешно', TokenModel)
-@router.post(
-    '/login',
-    summary='Авторизация пользователя в системе',
-    responses={
-        **throws.docs([
-            UserCRUD.login,
-            UserCRUD.generate_token,
-            resp,
-        ]),
-    }
-)
+
+
+@router.post('/login',
+             summary='Авторизация пользователя в системе',
+             responses={
+                 **throws.docs([
+                     UserCRUD.login,
+                     UserCRUD.generate_token,
+                     resp,
+                 ]),
+             })
 def login(form: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)) -> TokenModel:
     try:
         user = UserCRUD.login(db, UserAuthorizationForm(email=form.username, password=form.password))
-        if not user.is_active:
+        if not user.email_confirmed:
             raise UserNotActiveException.get()
-        token = UserCRUD.generate_token(user.id)
+        token = UserCRUD.generate_token(user)
         return resp.response(TokenModel(access_token=token))
     except AuthorizationException as e:
         raise e.get()
-
-

@@ -19,8 +19,8 @@ class UserNotFoundException(AuthorizationException):
 class WrongPasswordException(AuthorizationException, ValueError):
     META = dict(status_code=401, detail='Некорректный логин или пароль')
 
-class WrongConfirmationVariant(AuthorizationException):
-    META = dict(status_code=401, detail='Ошибка состояния кода подтверждения')
+class WrongPasswordsDontMatchException(WrongPasswordException):
+    META = dict(status_code=401, detail='Введенные пароли не совпадают')
 
 class InvalidTokenException(AuthorizationException, ValueError):
     META = dict(status_code=401, detail='Некорректный токен доступа')

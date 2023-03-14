@@ -1,16 +1,16 @@
 from pydantic import BaseModel, EmailStr, Field, validator
 from ..subscription.models import SubscriptionInfo
-from ..types import PhoneNumber, Username
-from crud.db_models.user import ConfirmationVariant
+from ..types import PhoneNumber, Username, Attachment
 
 class UserShared(BaseModel):
     id: int = Field(title='Идентификатор пользователя')
     username: Username = Field(title='Имя пользователя')
+    avatar: Attachment = Field(title='Аватар пользователя')
 
 class UserPublic(UserShared):
     email: EmailStr = Field(title='Электронная почта')
     number: PhoneNumber = Field(title='Номер телефона')
-    is_active: bool = Field(title='Активирована ли почта пользователя')
+    email_confirmed: bool = Field(title='Активирована ли почта пользователя')
     subscription_id: int | None = Field(title='Идентификатор подписки')
     subscription: SubscriptionInfo | None = Field(title='Информация о подписке')
     class Config:
@@ -18,8 +18,8 @@ class UserPublic(UserShared):
 
 class UserPrivate(UserPublic):
     hashed_password: str = Field(title='Хэш пароля')
-    confirmation_code: str = Field(title='Хеш кода подтверждения')
-    confirmation_variant: ConfirmationVariant = Field(title='Вариант подтверждения почты')
+    email_confirmation_code: str = Field(title='Хеш кода подтверждения')
+    password_reset_code: str = Field(title='Хеш кода подтверждения для смены пароля')
     class Config:
         orm_mode = True
 

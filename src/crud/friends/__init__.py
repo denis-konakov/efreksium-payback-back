@@ -10,7 +10,7 @@ class FriendsCRUD(CRUDBase):
         UserAlreadyYourFriendException,
         CannotAddHimselfToFriendsException,
     ])
-    def add(cls, db: Session, sender_id: int, recipient_id: int) -> FriendPrivate:
+    def add(cls, db: Session, sender_id: int, recipient_id: int) -> FriendDatabaseModel:
         if sender_id == recipient_id:
             raise CannotAddHimselfToFriendsException()
         check_user_exists = db.query(UserDatabaseModel).where(q.or_(
@@ -30,26 +30,25 @@ class FriendsCRUD(CRUDBase):
             db.add(n)
             db.commit()
             db.refresh(n)
-            return FriendPrivate.from_orm(n)
+            return n
         if invite.status:
             raise UserAlreadyYourFriendException()
         invite.status = True
         db.commit()
-        return FriendPrivate.from_orm(invite)
+        db.refresh(invite)
+        return invite
     @classmethod
-    @throws([UserNotFoundException])
+    @throws([
+
+    ])
     def get(cls,
             db: Session,
-            user_id: int,
-            page: PaginateContentParams,
-            exists: bool = False) -> PaginateContent[FriendPrivate]:
-        if not exists:
-            if db.query(UserDatabaseModel).filter_by(id=user_id).first() is None:
-                raise UserNotFoundException()
+            user: UserDatabaseModel,
+            page: PaginateContentParams) -> PaginateContent[FriendDatabaseModel]:
         crit = q.and_(
             FriendDatabaseModel.status == True, q.or_(
-                FriendDatabaseModel.sender_id == user_id,
-                FriendDatabaseModel.recipient_id == user_id
+                FriendDatabaseModel.sender_id == user.id,
+                FriendDatabaseModel.recipient_id == user.id
             )
         )
         friends = db.query(FriendDatabaseModel)\
@@ -59,7 +58,7 @@ class FriendsCRUD(CRUDBase):
             .offset(page.offset)\
             .all()
         total = db.query(FriendDatabaseModel).where(crit).count()
-        return PaginateContent[FriendPrivate](
+        return PaginateContent[FriendDatabaseModel](
             result=friends,
             count=len(friends),
             total=total,

@@ -12,7 +12,7 @@ resp = HTTPResponseModel.success('Список друзей', PaginateContent[Fr
                 resp
             ]))
 def friends_get(page: PaginateContentParams,
-                user: UserPrivate = Depends(get_current_user),
+                user: UserDatabaseModel = Depends(get_current_user),
                 db: Session = Depends(get_db)):
     try:
         return resp.response(PaginateContent[FriendPublic].from_orm(

@@ -2,7 +2,7 @@ import time
 import sqlalchemy as q
 from config import Config
 from loguru import logger
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 db_uri = f"postgresql://{Config.DB.USER}:{Config.DB.PASSWORD}@{Config.DB.HOST}:{Config.DB.PORT}/{Config.DB.DATABASE}"
 
@@ -16,8 +16,12 @@ while True:
         time.sleep(5)
 logger.info('Database is ready')
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base(bind=engine)
+T = declarative_base(bind=engine)
 
+class Base(T):
+    __abstract__ = True
+    def session(self) -> Session:
+        return SessionLocal.object_session(self)
 __all__ = (
     'SessionLocal',
     'Base',

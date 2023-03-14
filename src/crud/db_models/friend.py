@@ -1,7 +1,6 @@
 from db import Base
 import sqlalchemy as q
 from sqlalchemy.orm import relationship
-from .user import UserDatabaseModel
 class FriendDatabaseModel(Base):
     __tablename__ = 'friends'
     id = q.Column(q.Integer, primary_key=True, index=True)
