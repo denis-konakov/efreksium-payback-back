@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ ! -d "/secrets" ]; then
     /bin/bash /sh_scripts/create_secrets.sh
 fi
