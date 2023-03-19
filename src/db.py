@@ -4,7 +4,7 @@ from config import Config
 from loguru import logger
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
-db_uri = f"postgresql://{Config.DB.USER}:{Config.DB.PASSWORD}@{Config.DB.HOST}:{Config.DB.PORT}/{Config.DB.DATABASE}"
+db_uri = Config.DB.URL
 
 while True:
     try:

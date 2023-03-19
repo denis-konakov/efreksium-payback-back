@@ -1,5 +1,4 @@
 import os
-from typing import overload
 from datetime import timedelta
 
 from loguru import logger
@@ -38,11 +37,7 @@ class Config:
         TEMPLATES_DIR:      str = os.getenv(f'{__prefix}TEMPLATES_DIR')
 
     class DB:
-        __prefix = 'POSTGRES_'
-        HOST:       str = os.getenv(f'{__prefix}HOST', 'localhost')
-        PORT:       int = int(os.getenv(f'{__prefix}PORT', '5432'))
-        USER:       str = os.getenv(f'{__prefix}USER', 'postgres')
-        PASSWORD:   str = os.getenv(f'{__prefix}PASSWORD', 'postgres')
-        DATABASE:   str = os.getenv(f'{__prefix}DB', 'postgres')
+        __prefix = 'DATABASE_'
+        URL: str = os.getenv(f'{__prefix}URL')
     class Secrets:
         SESSION_KEY = try_read('/deps/secrets/session_key.bin', 'rb', b'secret123').hex()

@@ -5,11 +5,7 @@ services:
     build: .
     environment:
       - ROOT_PATH=/
-      - POSTGRES_HOST=base
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - DATABASE_URL=postgresql://postgres:postgres@base:5432/postgres
       - EMAIL_ENABLED=True
       - EMAIL_SERVER=smtp4dev
       - EMAIL_PORT=25
