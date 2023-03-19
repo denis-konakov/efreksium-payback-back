@@ -1,0 +1,21 @@
+## Переменные окружения:
+### Сервис вложений
+- `ATTACHMENTS_SERVICE_ENABLED: bool`
+- `ATTACHMENTS_SERVICE_PRIVATE_URL: str`
+- `ATTACHMENTS_SERVICE_PUBLIC_URL: str`
+- `ATTACHMENTS_SERVICE_SECRET_KEY: str`
+### Внутренние настройки
+- `TOKEN_EXPIRE_INTERVAL: int`
+### Настройки почты
+- `EMAIL_ENABLED: bool`
+- `EMAIL_FROM: str`
+- `EMAIL_FROM_NAME: str`
+- `EMAIL_PASSWORD: str`
+- `EMAIL_SERVER: str`
+- `EMAIL_PORT: int`
+- `EMAIL_TLS: bool`
+- `EMAIL_SSL: bool`
+- `EMAIL_USE_CREDENTIALS: bool`
+- `EMAIL_TEMPLATES_DIR: str`
+### Настройки базы данных
+- `DATABASE_URL: str`
