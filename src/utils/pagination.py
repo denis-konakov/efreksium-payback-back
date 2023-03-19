@@ -10,6 +10,7 @@ class PaginateContent(GenericModel, Generic[T]):
     total: int = Field(title='Общее количество записей в базе')
     class Config:
         arbitrary_types_allowed = True
+        orm_mode = True
 
 class PaginateContentParams(BaseModel):
     offset: int = Field(title='Смещение выборки', ge=0)

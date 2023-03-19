@@ -1,10 +1,13 @@
+from pydantic import EmailStr
+
 from . import router
 from depends import get_db, Depends, Session
 from crud import UserAuthorizationForm, UserCRUD, AuthorizationException, UserNotActiveException, WrongPasswordException
 from utils.response import HTTPResponseModel, TokenModel
 from utils.throws import throws
 from fastapi.security import OAuth2PasswordRequestForm
-
+from utils import cast
+from crud.exceptions import *
 resp = HTTPResponseModel.success('Авторизация прошла успешно', TokenModel)
 
 
@@ -20,7 +23,8 @@ resp = HTTPResponseModel.success('Авторизация прошла успеш
 def login(form: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)) -> TokenModel:
     try:
-        user = UserCRUD.login(db, UserAuthorizationForm(email=form.username, password=form.password))
+
+        user = UserCRUD.login(db, UserAuthorizationForm(email=cast(form.username, EmailStr), password=form.password))
         if not user.email_confirmed:
             raise UserNotActiveException.get()
         token = UserCRUD.generate_token(user)

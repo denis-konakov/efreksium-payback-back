@@ -43,7 +43,7 @@ class UserCRUD(CRUDBase):
 
     @classmethod
     @throws([
-        UserNotFoundException,
+        # UserNotFoundException,
         WrongPasswordException,
     ])
     def login(cls,
@@ -51,7 +51,8 @@ class UserCRUD(CRUDBase):
               data: UserAuthorizationForm) -> UserDatabaseModel:
         user = db.query(UserDatabaseModel).filter_by(email=data.email).first()
         if user is None:
-            raise UserNotFoundException()
+            # raise UserNotFoundException()
+            raise WrongPasswordException()
         if not cls.pwd_context.verify(data.password, user.hashed_password):
             raise WrongPasswordException()
         return user
