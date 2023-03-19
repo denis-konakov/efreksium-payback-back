@@ -44,4 +44,4 @@ class Config:
         PASSWORD:   str = os.getenv(f'{__prefix}PASSWORD', 'postgres')
         DATABASE:   str = os.getenv(f'{__prefix}DB', 'postgres')
     class Secrets:
-        SESSION_KEY = try_read('/secrets/session_key.bin', 'rb', b'secret123').hex()
+        SESSION_KEY = try_read('/deps/secrets/session_key.bin', 'rb', b'secret123').hex()

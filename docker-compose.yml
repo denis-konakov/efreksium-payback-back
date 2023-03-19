@@ -2,7 +2,6 @@ version: "2"
 
 services:
   backend:
-    container_name: jpayments_backend
     build: .
     environment:
       - ROOT_PATH=/
@@ -24,9 +23,8 @@ services:
       - base
     volumes:
       - ./email_templates:/email_templates
-      - ./secrets:/secrets
+      - ./secrets:/deps
   base:
-    container_name: jpayments_base
     image: "postgres:13"
     restart: always
     volumes:
@@ -37,7 +35,6 @@ services:
       - POSTGRES_DB=postgres
       - PORT=5432
   pgweb:
-    container_name: jpayments_pgweb
     image: sosedoff/pgweb
     restart: always
     environment:
@@ -45,7 +42,6 @@ services:
     depends_on:
       - base
   smtp4dev:
-    container_name: jpayments_smtp4dev
     image: rnwood/smtp4dev
     volumes:
         - ./smtp4dev-data:/smtp4dev
