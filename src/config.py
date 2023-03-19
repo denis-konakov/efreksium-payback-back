@@ -17,6 +17,7 @@ def try_read(path: str, mode: str, default: T) -> T:
 class Config:
     class AttachmentsService:
         __prefix = 'ATTACHMENTS_SERVICE_'
+        ENABLED: bool = bool(os.getenv(f'{__prefix}ENABLED', False))
         PRIVATE_URL:    str = os.getenv(f'{__prefix}PRIVATE_URL', '')
         PUBLIC_URL:     str = os.getenv(f'{__prefix}PUBLIC_URL', '')
         SECRET_KEY:     str = os.getenv(f'{__prefix}SECRET_KEY', '')
