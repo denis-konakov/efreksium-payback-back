@@ -22,7 +22,6 @@ services:
     depends_on:
       - base
     volumes:
-      - ./email_templates:/email_templates
       - ./secrets:/deps
   base:
     image: "postgres:13"
