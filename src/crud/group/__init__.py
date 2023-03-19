@@ -1,4 +1,4 @@
-from .. import CRUDBase
+from ..err_proxy import CRUDBase
 from ..db_models import UserDatabaseModel
 from utils import throws
 from sqlalchemy.orm import Session
@@ -8,4 +8,4 @@ class GroupCRUD(CRUDBase):
 
     ])
     def create(self, db: Session, user: UserDatabaseModel, name: GroupName):
-        if user.subscription
+        pass

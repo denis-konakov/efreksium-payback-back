@@ -5,6 +5,7 @@ services:
     container_name: jpayments_backend
     build: .
     environment:
+      - ROOT_PATH=/
       - POSTGRES_HOST=base
       - POSTGRES_PORT=5432
       - POSTGRES_DB=postgres
@@ -17,6 +18,8 @@ services:
       - EMAIL_FROM_NAME=oreply@smtp4dev.lan
       - EMAIL_PASSWORD=noreply
       - EMAIL_TEMPLATES_DIR=/email_templates
+    ports:
+      - "80:8000"
     depends_on:
       - base
     volumes:
@@ -38,25 +41,13 @@ services:
     image: sosedoff/pgweb
     restart: always
     environment:
-        - PGWEB_DB_URL=postgres://postgres:postgres@base:5432/postgres
+        - DATABASE_URL=postgres://postgres:postgres@base:5432/postgres?sslmode=disable
     depends_on:
       - base
-  nginx:
-    container_name: jpayments_nginx
-    image: nginx:1.23.2
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template
-    depends_on:
-      - backend
-    environment:
-      - PROXY_HOST=localhost
   smtp4dev:
     container_name: jpayments_smtp4dev
     image: rnwood/smtp4dev
     volumes:
         - ./smtp4dev-data:/smtp4dev
     ports:
-      - "1337:80"
+      - "88:80"

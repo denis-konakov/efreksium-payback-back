@@ -16,4 +16,4 @@ resp = HTTPResponseModel.success('Группа успешно создана')
              })
 def groups_create(name: GroupName,
                   user: UserDatabaseModel = Depends(get_current_user)):
-
+    pass
