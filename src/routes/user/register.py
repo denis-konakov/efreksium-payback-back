@@ -8,8 +8,7 @@ from crud import (
 )
 from depends import confirm
 from depends import get_db, Session, Depends, get_mail, MailManager
-from utils import HTTPResponseModel
-from utils import throws
+from utils import HTTPResponseModel, ResponseException, throws
 from . import router
 
 resp = HTTPResponseModel.success(
@@ -52,6 +51,9 @@ def register(data: UserRegistrationForm,
         if user.email_confirmed:
             raise UserAlreadyExistsException.get()
         raise UserNotActiveException.get()
+    except ResponseException as e:
+        raise e.get()
+
 
 
 

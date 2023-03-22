@@ -5,6 +5,7 @@ from fastapi import BackgroundTasks
 from loguru import logger
 
 from crud import UserPublic
+from crud.exceptions import EmailSendMessageException
 from utils import throws
 path = Path(Config.Email.TEMPLATES_DIR)
 assert path.exists(), f'Path {path} does not exist'
@@ -26,25 +27,29 @@ class MailManager:
     def __init__(self, background_tasks: BackgroundTasks):
         self.__bt: BackgroundTasks = background_tasks
     @throws([
-
+        EmailSendMessageException
     ])
     def send(self,
              to: str,
              subject: str,
              template: str,
              context: dict):
-        msg = MessageSchema(
-            subject=subject,
-            recipients=[to],
-            template_body=context,
-            subtype=MessageType.html
-        )
-        fm = FastMail(conf)
-        self.__bt.add_task(
-            fm.send_message,
-            msg,
-            template
-        )
+        try:
+            msg = MessageSchema(
+                subject=subject,
+                recipients=[to],
+                template_body=context,
+                subtype=MessageType.html
+            )
+            fm = FastMail(conf)
+            self.__bt.add_task(
+                fm.send_message,
+                msg,
+                template
+            )
+        except Exception as e:
+            logger.error('email send exception:\n{}', e)
+            raise EmailSendMessageException()
     @throws([
         send,
     ])
