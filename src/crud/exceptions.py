@@ -29,6 +29,10 @@ class TokenDecodeException(InvalidTokenException):
     pass
 class TokenExpiredException(InvalidTokenException):
     pass
+# Email
+
+class EmailSendMessageException(ResponseException):
+    META = dict(detail='Ошибка отправки письма')
 
 # Friends
 class FriendException(ResponseException):

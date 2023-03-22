@@ -22,6 +22,9 @@ resp = HTTPResponseModel.success(
      summary='Регистрация пользователя',
      responses={
          **throws.docs([
+             confirm,
+             get_db,
+             get_mail,
              UserCRUD.register,
              UserCRUD.generate_email_confirmation_code,
              UserNotFoundException,

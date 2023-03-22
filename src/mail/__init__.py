@@ -5,7 +5,7 @@ from fastapi import BackgroundTasks
 from loguru import logger
 
 from crud import UserPublic
-
+from utils import throws
 path = Path(Config.Email.TEMPLATES_DIR)
 assert path.exists(), f'Path {path} does not exist'
 assert path.is_dir(), f'Path {path} is not a directory'
@@ -25,7 +25,9 @@ conf = ConnectionConfig(
 class MailManager:
     def __init__(self, background_tasks: BackgroundTasks):
         self.__bt: BackgroundTasks = background_tasks
+    @throws([
 
+    ])
     def send(self,
              to: str,
              subject: str,
@@ -43,6 +45,9 @@ class MailManager:
             msg,
             template
         )
+    @throws([
+        send,
+    ])
     def send_confirmation(self, to: str, link: str, user: UserPublic):
         self.send(
             to,
