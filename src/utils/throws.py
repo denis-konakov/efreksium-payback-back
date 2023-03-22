@@ -66,18 +66,14 @@ class ThrowsManager:
         r = set()
         for i in exceptions:
             t = set()
-            print('resolving', i)
-            # class method check
             if isinstance(i, functools.partial):
                 i = i.func.__self__
-                print('partial', i)
-
             if hasattr(i, 'exceptions'):
                 t = set(cls.join(i.exceptions()))
             elif inspect.isclass(i) and issubclass(i, ResponseException):
                 t = {i}
             else:
-                print('invalid', i)
+                raise ValueError('Unsupported type ' + i.__class__.__name__)
             r |= t
         return list(r)
 
@@ -110,6 +106,7 @@ class ThrowsManager:
 
         def throws_type_decorator(f: Callable[[], Any]):
             return self.get_base(f)(f, exceptions)
+
         return throws_type_decorator
 
 

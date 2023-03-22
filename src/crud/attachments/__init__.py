@@ -10,6 +10,7 @@ from crud.user import UserDatabaseModel
 from .models import AvatarUploadInfo
 from crud.exceptions import AvatarAlreadyExistsException
 from crud.types import AttachmentID
+from loguru import logger
 class AttachmentsCRUD(CRUDBase):
     @classmethod
     @throws([
@@ -17,6 +18,7 @@ class AttachmentsCRUD(CRUDBase):
     ])
     def _session(cls) -> ClientSession:
         if not Config.AttachmentsService.ENABLED:
+            logger.warning('Attachments service disabled in config')
             raise AttachmentServiceDeniedException()
         return ClientSession(headers={
             'X-Token': Config.AttachmentsService.SECRET_KEY,
@@ -27,16 +29,19 @@ class AttachmentsCRUD(CRUDBase):
         AttachmentServiceDeniedException,
     ])
     async def create(cls, user: UserDatabaseModel, flags: dict) -> AvatarUploadInfo:
-        async with cls._session() as session:
-            data = json.dumps(dict(
-                id=user.id,
-                flags=flags
-            ))
-            async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', data=data) as resp:
-                if not resp.status == 200:
-                    raise AttachmentServiceDeniedException()
-                body = await resp.json()
-                return AvatarUploadInfo(**body)
+        try:
+            async with cls._session() as session:
+                data = json.dumps(dict(
+                    id=user.id,
+                    flags=flags
+                ))
+                async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', data=data) as resp:
+                    if not resp.status == 200:
+                        raise AttachmentServiceDeniedException()
+                    body = await resp.json()
+                    return AvatarUploadInfo(**body)
+        except Exception as e:
+            logger.warning('Error while run /create method on AttachmentsService\n{}', e)
     @classmethod
     @throws([
         create,
