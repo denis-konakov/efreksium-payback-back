@@ -1,18 +1,20 @@
 import asyncio
+import functools
 import inspect
 from contextlib import contextmanager
-from functools import update_wrapper, partial
+from functools import update_wrapper, partial, wraps
 from typing import Iterable, Callable, Type, Any
 
 from .response import ResponseException, HTTPResponseModel
 
 
 class ThrowableFunction:
-    def __init__(self, f: Callable):
+    def __init__(self, f: Callable, exceptions=None):
         self._function = f
-        self._exceptions: list[ResponseException] = []
+        self._exceptions: list[Type[ResponseException]] = exceptions or []
         update_wrapper(self, f)
-
+    def __repr__(self):
+        return f'<{self.__class__.__name__} exceptions={self._exceptions} function={self._function}>'
     def __call__(self, *args, **kwargs):
         return self._function(*args, **kwargs)
     def __get__(self, instance: Callable, owner: Type[Callable]):
@@ -33,8 +35,8 @@ class ThrowableAsyncFunction(ThrowableFunction):
 
 
 class ThrowableContextManager(ThrowableFunction):
-    def __init__(self, f: Callable):
-        super().__init__(contextmanager(f))
+    def __init__(self, f: Callable, exceptions=None):
+        super().__init__(contextmanager(f), exceptions)
 
     def __call__(self, *args, **kwargs):
         with self._function(*args, **kwargs) as t:
@@ -52,7 +54,7 @@ class ThrowsManager:
     @classmethod
     def get_base(cls,
                  t: Callable
-                 ) -> Type[ThrowableFunction] | Type[ThrowableContextManager] | Type[ThrowableAsyncFunction]:
+                 ) -> Type[ThrowableFunction]:
         if inspect.isgeneratorfunction(t):
             return ThrowableContextManager
         if asyncio.iscoroutinefunction(t):
@@ -63,10 +65,20 @@ class ThrowsManager:
     def join(cls, exceptions: ThrowsExceptionsList) -> list[Type[ResponseException]]:
         r = set()
         for i in exceptions:
+            t = set()
+            print('resolving', i)
+            # class method check
+            if isinstance(i, functools.partial):
+                i = i.func.__self__
+                print('partial', i)
+
             if hasattr(i, 'exceptions'):
-                r |= set(i.exceptions())
+                t = set(cls.join(i.exceptions()))
             elif inspect.isclass(i) and issubclass(i, ResponseException):
-                r |= {i}
+                t = {i}
+            else:
+                print('invalid', i)
+            r |= t
         return list(r)
 
     @classmethod
@@ -93,19 +105,12 @@ class ThrowsManager:
                  ) -> ThrowableFunction | Callable[[...], ThrowableFunction]:
         if callable(exceptions):
             return self.get_base(exceptions)(exceptions)
-        if exceptions is None:
-            exceptions = []
+        exceptions = exceptions or []
         r = self.join(exceptions)
 
-        def wrapper(f: Callable[[], Any]):
-            class Wrapper(self.get_base(f)):
-                def __init__(self, func: Callable):
-                    super().__init__(func)
-                    self._exceptions = r
-
-            return Wrapper(f)
-
-        return wrapper
+        def throws_type_decorator(f: Callable[[], Any]):
+            return self.get_base(f)(f, exceptions)
+        return throws_type_decorator
 
 
 throws = ThrowsManager()

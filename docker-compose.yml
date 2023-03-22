@@ -32,6 +32,8 @@ services:
   pgweb:
     image: sosedoff/pgweb
     restart: always
+    ports:
+      - "8080:8081"
     environment:
         - DATABASE_URL=postgres://postgres:postgres@base:5432/postgres?sslmode=disable
     depends_on:

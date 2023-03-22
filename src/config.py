@@ -22,6 +22,7 @@ class Config:
         SECRET_KEY:     str = os.getenv(f'{__prefix}SECRET_KEY', '')
     class Settings:
         TOKEN_EXPIRE_INTERVAL: int | timedelta = timedelta(days=7)
+        ROOT_PATH:             str = os.getenv('ROOT_PATH', '/')
     class Email:
         __prefix = 'EMAIL_'
         ENABLED:            bool = bool(os.getenv(f'{__prefix}ENABLED', False))

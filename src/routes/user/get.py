@@ -21,6 +21,6 @@ def get_user(user_id: int,
         user = UserCRUD.get(db, id=user_id)
     except ResponseException as e:
         raise e.get()
-    if not user.is_active:
+    if not user.email_confirmed:
         raise UserNotFoundException.get()
     return resp.response(UserShared.from_orm(user))

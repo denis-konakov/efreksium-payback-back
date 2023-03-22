@@ -14,7 +14,7 @@ from utils.response import ResponseException
 app = fastapi.FastAPI(responses={
     422: {
         'description': 'Ошибка валидации данных',
-        'content': {'application/json': {'example_url': {
+        'content': {'application/json': {'example': {
             'detail': {
                 'detail': 'Ошибка валидации данных',
                 'program_code': 'validation_exception',
