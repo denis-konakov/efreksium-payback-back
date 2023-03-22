@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from config import Config
-from typing import Callable, TypeVar, Generic
+from typing import Callable, TypeVar, Generic, Any
 from fastapi import HTTPException
 from pydantic.generics import GenericModel
 
@@ -50,6 +50,9 @@ MetaDataDictType = dict[str,
 ]
 T2 = TypeVar('T2')
 class ResponseException(Exception, Generic[T2]):
+    def __init__(self, **kwargs):
+        self.additional: dict[str, Any] = kwargs
+
     META: MetaDataDictType = dict(
         status_code=500,
         detail='Internal server error',

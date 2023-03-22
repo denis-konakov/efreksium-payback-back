@@ -17,13 +17,13 @@ services:
       - "80:8000"
     depends_on:
       - base
-    volumes:
-      - ./secrets:/deps
+#    volumes:
+#      - ./secrets:/deps
   base:
     image: "postgres:13"
     restart: always
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+#    volumes:
+#      - ./postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -38,7 +38,7 @@ services:
       - base
   smtp4dev:
     image: rnwood/smtp4dev
-    volumes:
-        - ./smtp4dev-data:/smtp4dev
+#    volumes:
+#        - ./smtp4dev-data:/smtp4dev
     ports:
       - "88:80"

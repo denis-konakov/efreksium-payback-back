@@ -35,9 +35,14 @@ class UserCRUD(CRUDBase):
         try:
             db.add(user)
             db.commit()
-        except IntegrityError:
+        except Exception:
             db.rollback()
-            raise UserAlreadyExistsException()
+            user = db.query(UserDatabaseModel).filter(q.or_(
+                UserDatabaseModel.email == data.email,
+                UserDatabaseModel.username == data.username,
+                UserDatabaseModel.number == data.number,
+            )).first()
+            raise UserAlreadyExistsException(user=user)
         db.refresh(user)
         return user
 

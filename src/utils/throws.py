@@ -1,8 +1,8 @@
 import asyncio
 import inspect
 from contextlib import contextmanager
-from functools import update_wrapper
-from typing import Iterable, Callable, Type, Any, overload
+from functools import update_wrapper, partial
+from typing import Iterable, Callable, Type, Any
 
 from .response import ResponseException, HTTPResponseModel
 
@@ -15,7 +15,8 @@ class ThrowableFunction:
 
     def __call__(self, *args, **kwargs):
         return self._function(*args, **kwargs)
-
+    def __get__(self, instance: Callable, owner: Type[Callable]):
+        return partial(self.__call__, instance)
     def name(self) -> str:
         return self._function.__name__
 
