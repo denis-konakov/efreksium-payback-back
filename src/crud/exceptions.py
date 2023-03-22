@@ -2,28 +2,28 @@ from utils.response import ResponseException
 
 # Authorization
 class AuthorizationException(ResponseException):
-    pass
+    META = dict(status_code=401)
 
 class UserNotActiveException(AuthorizationException):
-    META = dict(status_code=403, detail='Пользователь не активирован')
+    META = dict(detail='Пользователь не активирован')
 
 class WrongConfirmationCodeException(AuthorizationException, ValueError):
-    META = dict(status_code=400, detail='Некорректный код подтверждения')
+    META = dict(detail='Некорректный код подтверждения')
 
 class UserAlreadyExistsException(AuthorizationException):
-    META = dict(status_code=400, detail='Пользователь с такими данными уже существует')
+    META = dict(detail='Пользователь с такими данными уже существует')
 
 class UserNotFoundException(AuthorizationException):
     META = dict(status_code=404, detail='Пользователь с такими данными не найден')
 
 class WrongPasswordException(AuthorizationException, ValueError):
-    META = dict(status_code=401, detail='Некорректный логин или пароль')
+    META = dict(detail='Некорректный логин или пароль')
 
 class WrongPasswordsDontMatchException(WrongPasswordException):
-    META = dict(status_code=401, detail='Введенные пароли не совпадают')
+    META = dict(detail='Введенные пароли не совпадают')
 
 class InvalidTokenException(AuthorizationException, ValueError):
-    META = dict(status_code=401, detail='Некорректный токен доступа')
+    META = dict(detail='Некорректный токен доступа')
 
 class TokenDecodeException(InvalidTokenException):
     pass
@@ -31,12 +31,25 @@ class TokenExpiredException(InvalidTokenException):
     pass
 
 # Friends
+class FriendException(ResponseException):
+    META = dict(status_code=401)
 
 class AddFriendException(ResponseException):
-    META = dict(status_code=401, detail='Ошибка при добавлении пользователя в друзья')
+    META = dict(detail='Ошибка при добавлении пользователя в друзья')
 
 class CannotAddHimselfToFriendsException(AddFriendException):
-    META = dict(status_code=401, detail='Нельзя добавить себя в друзья')
+    META = dict(detail='Нельзя добавить себя в друзья')
 
 class UserAlreadyYourFriendException(AddFriendException):
-    META = dict(status_code=401, detail='Этот пользователь уже у вас в друзьях')
+    META = dict(detail='Этот пользователь уже у вас в друзьях')
+
+# Attachments
+
+class AttachmentsException(ResponseException):
+    META = dict(status_code=401, detail='Ошибка взаимодействия с вложениями')
+
+class AttachmentServiceDeniedException(AttachmentsException):
+    META = dict(detail='Ошибка взаимодействия с сервисом вложений')
+
+class AvatarAlreadyExistsException(AttachmentsException):
+    META = dict(detail='У вас уже есть аватар')

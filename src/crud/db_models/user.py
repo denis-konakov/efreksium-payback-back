@@ -1,7 +1,7 @@
 import sqlalchemy as q
 from sqlalchemy.orm import relationship
 from db import Base
-
+from crud.types import AttachmentID
 
 class UserDatabaseModel(Base):
     __tablename__ = 'users'
@@ -10,7 +10,7 @@ class UserDatabaseModel(Base):
     username = q.Column(q.String(128), unique=False)
     email = q.Column(q.String(128), unique=True)
     number = q.Column(q.String(20), unique=True)
-    avatar = q.Column(q.String(32), nullable=False, default='default')
+    avatar = q.Column(q.String(32), nullable=False, default=AttachmentID.default())
 
     hashed_password = q.Column(q.String(128), nullable=False)
 

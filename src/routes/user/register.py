@@ -1,20 +1,17 @@
-from utils import HTTPResponseModel
-from . import router
-from fastapi import Request
-from depends import get_db, Session, Depends, get_mail, MailManager
 from config import Config
-from depends import confirm
-from utils import throws, url_add_arguments
 from crud import (
     UserRegistrationForm,
     UserCRUD,
-    UserPublic,
     UserAlreadyExistsException,
     UserNotFoundException,
     UserNotActiveException,
 )
-from pydantic import AnyHttpUrl
-from config import Config
+from depends import confirm
+from depends import get_db, Session, Depends, get_mail, MailManager
+from utils import HTTPResponseModel
+from utils import throws
+from . import router
+
 resp = HTTPResponseModel.success(
     'Код подтверждения почты отправлен' if Config.Email.ENABLED else
     'Успешная регистрация'

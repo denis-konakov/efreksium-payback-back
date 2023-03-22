@@ -50,16 +50,19 @@ MetaDataDictType = dict[str,
 ]
 T2 = TypeVar('T2')
 class ResponseException(Exception, Generic[T2]):
-    BASE_META: MetaDataDictType = dict(
+    META: MetaDataDictType = dict(
         status_code=500,
         detail='Internal server error',
         program_code=lambda cls: _camel_to_snake(_search_parent_has_meta(cls).__name__),
         status=False,
     )
-    META: MetaDataDictType = dict()
     @classmethod
     def get_meta(cls, **kwargs: MetaDataDictType) -> dict[str, str | int]:
-        meta = {**cls.BASE_META, **cls.META, **kwargs}
+        parents = reversed([i for i in cls.__mro__ if issubclass(i, ResponseException)])
+        meta = {}
+        for i in parents:
+            meta.update(i.META)
+        meta.update(kwargs)
         for i in meta.keys():
             if callable(meta.get(i)) and meta.get(i).__class__.__name__ == 'function':
                 meta[i] = meta[i](cls)

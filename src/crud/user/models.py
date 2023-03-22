@@ -1,11 +1,13 @@
 from pydantic import BaseModel, EmailStr, Field, validator
 from ..subscription.models import SubscriptionInfo
-from ..types import PhoneNumber, Username, Attachment
+from ..types import PhoneNumber, Username, AttachmentID
 
 class UserShared(BaseModel):
     id: int = Field(title='Идентификатор пользователя')
     username: Username = Field(title='Имя пользователя')
-    avatar: Attachment = Field(title='Аватар пользователя')
+    avatar: AttachmentID = Field(title='Аватар пользователя')
+    class Config:
+        orm_mode = True
 
 class UserPublic(UserShared):
     email: EmailStr = Field(title='Электронная почта')

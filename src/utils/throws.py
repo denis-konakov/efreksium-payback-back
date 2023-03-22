@@ -1,9 +1,10 @@
-from typing import Iterable, Callable, Type, TypeVar, Generic, Any
-from .response import ResponseException, HTTPResponseModel
-from functools import update_wrapper, lru_cache
-from contextlib import contextmanager, AbstractContextManager
+import asyncio
 import inspect
-from fastapi import Depends
+from contextlib import contextmanager
+from functools import update_wrapper
+from typing import Iterable, Callable, Type, Any, overload
+
+from .response import ResponseException, HTTPResponseModel
 
 
 class ThrowableFunction:
@@ -25,6 +26,11 @@ class ThrowableFunction:
         return getattr(self._function, item)
 
 
+class ThrowableAsyncFunction(ThrowableFunction):
+    async def __call__(self, *args, **kwargs):
+        return await self._function(*args, **kwargs)
+
+
 class ThrowableContextManager(ThrowableFunction):
     def __init__(self, f: Callable):
         super().__init__(contextmanager(f))
@@ -43,9 +49,13 @@ class ThrowsManager:
         pass
 
     @classmethod
-    def get_base(cls, t: Callable) -> Type[ThrowableFunction] | Type[ThrowableContextManager]:
+    def get_base(cls,
+                 t: Callable
+                 ) -> Type[ThrowableFunction] | Type[ThrowableContextManager] | Type[ThrowableAsyncFunction]:
         if inspect.isgeneratorfunction(t):
             return ThrowableContextManager
+        if asyncio.iscoroutinefunction(t):
+            return ThrowableAsyncFunction
         return ThrowableFunction
 
     @classmethod
@@ -77,10 +87,9 @@ class ThrowsManager:
                 }
             r[i.status_code()]['content']['application/json']['examples'][i.detail()] = i.example()
         return r
-
     def __call__(self,
-                 exceptions: ThrowsExceptionsList | Callable | None = None) -> ThrowableFunction | Callable[
-        [...], ThrowableFunction]:
+                 exceptions: ThrowsExceptionsList | Callable | None = None
+                 ) -> ThrowableFunction | Callable[[...], ThrowableFunction]:
         if callable(exceptions):
             return self.get_base(exceptions)(exceptions)
         if exceptions is None:

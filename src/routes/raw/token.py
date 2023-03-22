@@ -9,7 +9,7 @@ from utils import TokenModel, throws, HTTPResponseModel
              summary='Получение токена',
              responses={
                  **throws.docs([
-                    get_db,
+                     get_db,
                      UserCRUD.login,
                      UserNotActiveException,
                      UserCRUD.generate_token,
