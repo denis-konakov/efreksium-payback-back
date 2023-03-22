@@ -62,10 +62,13 @@ class ThrowsManager:
         return ThrowableFunction
 
     @classmethod
-    def join(cls, exceptions: ThrowsExceptionsList) -> list[Type[ResponseException]]:
+    def join(cls,
+             exceptions: ThrowsExceptionsList) -> list[Type[ResponseException]]:
         r = set()
         for i in exceptions:
             t = set()
+            if hasattr(i, '__func__'):
+                i = i.__func__
             if isinstance(i, functools.partial):
                 i = i.func.__self__
             if hasattr(i, 'exceptions'):
@@ -73,7 +76,7 @@ class ThrowsManager:
             elif inspect.isclass(i) and issubclass(i, ResponseException):
                 t = {i}
             else:
-                raise ValueError('Unsupported type ' + i.__class__.__name__)
+                raise ValueError(f'Unsupported type {i.__class__.__name__} {i}')
             r |= t
         return list(r)
 
