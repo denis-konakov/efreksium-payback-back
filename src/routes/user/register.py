@@ -23,7 +23,7 @@ resp = HTTPResponseModel.success(
          **throws.docs([
              confirm,
              get_db,
-             get_mail,
+             MailManager.send_confirmation,
              UserCRUD.register,
              UserCRUD.generate_email_confirmation_code,
              UserNotFoundException,

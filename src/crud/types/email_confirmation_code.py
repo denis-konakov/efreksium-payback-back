@@ -38,7 +38,6 @@ class EmailConfirmationCode(str, AbstractTypeBase):
         return self.secret
 
     def verify(self, pwd_context: CryptContext, public_code: str):
-        print('check', self.secret, public_code)
         return pwd_context.verify(self.secret, public_code)
 
     @classmethod
@@ -48,9 +47,7 @@ class EmailConfirmationCode(str, AbstractTypeBase):
     @classmethod
     def generate(cls, pwd_context: CryptContext, email: EmailStr) -> PublicPrivateCodePair:
         code = token_hex(16)
-
         scode = pwd_context.hash(code)
-        print('generate', code, scode)
         code = base64.b64encode(f'{code}:{email}'.encode()).decode()
         return PublicPrivateCodePair(public=scode, private=EmailConfirmationCode(code))
 
