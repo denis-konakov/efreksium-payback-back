@@ -4,7 +4,7 @@ from .base import AbstractTypeBase
 from pydantic import AnyHttpUrl
 
 _DEFAULT = 'DEFAULT'
-_attachment_regex = re.compile(r'^[0-9A-Za-z]{16}$|^%s$' % (_DEFAULT,))
+_attachment_regex = re.compile(r'^[0-9A-Za-z]{8,16}$|^%s$' % (_DEFAULT,))
 class AttachmentID(str, AbstractTypeBase):
     @classmethod
     def default(cls):
