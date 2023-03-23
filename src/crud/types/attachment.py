@@ -3,11 +3,12 @@ from config import Config
 from .base import AbstractTypeBase
 from pydantic import AnyHttpUrl
 
-_attachment_regex = re.compile(r'^[0-9A-F]{16}$|^default$')
+_DEFAULT = 'DEFAULT'
+_attachment_regex = re.compile(r'^[0-9A-Za-z]{16}$|^%s$' % (_DEFAULT,))
 class AttachmentID(str, AbstractTypeBase):
     @classmethod
     def default(cls):
-        return 'DEFAULT'
+        return _DEFAULT
     @classmethod
     def example_url(cls):
         return cls(cls.default()).url()

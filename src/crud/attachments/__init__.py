@@ -1,11 +1,9 @@
-import aiohttp.web_response
 
 from ..err_proxy import CRUDBase
 from utils import throws
 from crud.exceptions import AttachmentServiceDeniedException
 from aiohttp import ClientSession
 from config import Config
-import json
 from crud.user import UserDatabaseModel
 from .models import AvatarUploadInfo
 from crud.exceptions import AvatarAlreadyExistsException
