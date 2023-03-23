@@ -6,7 +6,8 @@ from utils.throws import throws
 from crud.exceptions import InvalidTokenException
 from config import Config
 path = Config.Settings.ROOT_PATH
-path = path if path != '/' else ''
+if path.endswith('/'):
+    path = path[:-1]
 oauth2scheme = OAuth2PasswordBearer(
     tokenUrl=f"{path}/raw/token",
     auto_error=False,

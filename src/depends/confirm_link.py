@@ -21,6 +21,6 @@ class ConfirmLink:
             return url_add_arguments(redirect, {
                 'confirm_code': code
             })
-        return wraps
+        return confirm_link_wrapper
 
 confirm: ConfirmLink = throws(ConfirmLink())
