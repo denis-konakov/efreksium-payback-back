@@ -50,9 +50,12 @@ class AttachmentsCRUD(CRUDBase):
     async def create_avatar(cls, user: UserDatabaseModel):
         if user.avatar != AttachmentID.default():
             raise AvatarAlreadyExistsException()
-        return await cls.create(user, {
+        data = await cls.create(user, {
             'type': 'user_avatar'
         })
+        user.avatar = data.image_id
+        user.session().commit()
+        return data
 
 
 
