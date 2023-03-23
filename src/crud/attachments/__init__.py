@@ -31,11 +31,11 @@ class AttachmentsCRUD(CRUDBase):
     async def create(cls, user: UserDatabaseModel, flags: dict) -> AvatarUploadInfo:
         try:
             async with cls._session() as session:
-                data = json.dumps(dict(
+                data = dict(
                     id=user.id,
                     flags=flags
-                ))
-                async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', data=data) as resp:
+                )
+                async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', json=data) as resp:
                     print(await resp.json())
                     if not resp.status == 200:
                         raise AttachmentServiceDeniedException()
