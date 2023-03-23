@@ -34,7 +34,7 @@ class AttachmentsCRUD(CRUDBase):
                     flags=flags
                 )
                 async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', json=data) as resp:
-                    print(await resp.json())
+                    logger.debug('AttachmentsService.create response {}', await resp.json())
                     if not resp.status == 200:
                         raise AttachmentServiceDeniedException()
                     body = await resp.json()
