@@ -12,17 +12,20 @@ def try_read(path: str, mode: str, default: T) -> T:
         logger.error('File not found: {}', path)
         return default
 
-
+def normpath(path: str) -> str:
+    while path.endswith('/'):
+        path = path[:-1]
+    return path
 class Config:
     class AttachmentsService:
         __prefix = 'ATTACHMENTS_SERVICE_'
         ENABLED:        bool = bool(os.getenv(f'{__prefix}ENABLED', False))
-        PRIVATE_URL:    str = os.getenv(f'{__prefix}PRIVATE_URL', '')
-        PUBLIC_URL:     str = os.getenv(f'{__prefix}PUBLIC_URL', '')
+        PRIVATE_URL:    str = normpath(os.getenv(f'{__prefix}PRIVATE_URL', ''))
+        PUBLIC_URL:     str = normpath(os.getenv(f'{__prefix}PUBLIC_URL', ''))
         SECRET_KEY:     str = os.getenv(f'{__prefix}SECRET_KEY', '')
     class Settings:
         TOKEN_EXPIRE_INTERVAL: int | timedelta = timedelta(days=7)
-        ROOT_PATH:             str = os.getenv('ROOT_PATH', '/')
+        ROOT_PATH:             str = normpath(os.getenv('ROOT_PATH', '/'))
     class Email:
         __prefix = 'EMAIL_'
         ENABLED:            bool = bool(os.getenv(f'{__prefix}ENABLED', False))
