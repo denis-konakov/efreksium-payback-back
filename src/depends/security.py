@@ -5,9 +5,10 @@ from crud import UserCRUD, UserDatabaseModel
 from utils.throws import throws
 from crud.exceptions import InvalidTokenException
 from config import Config
-
+path = Config.Settings.ROOT_PATH
+path = path if path != '/' else ''
 oauth2scheme = OAuth2PasswordBearer(
-    tokenUrl=f"{Config.Settings.ROOT_PATH}/raw/token".replace('//', '/'),
+    tokenUrl=f"{path}/raw/token",
     auto_error=False,
 )
 
