@@ -36,12 +36,14 @@ class AttachmentsCRUD(CRUDBase):
                     flags=flags
                 ))
                 async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', data=data) as resp:
+                    print(await resp.json())
                     if not resp.status == 200:
                         raise AttachmentServiceDeniedException()
                     body = await resp.json()
                     return AvatarUploadInfo(**body)
         except Exception as e:
             logger.warning('Error while run /create method on AttachmentsService\n{}', e)
+            raise AttachmentServiceDeniedException()
     @classmethod
     @throws([
         create,
