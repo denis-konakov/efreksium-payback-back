@@ -21,10 +21,8 @@ class ThrowableFunction:
         return partial(self.__call__, instance)
     def name(self) -> str:
         return self._function.__name__
-
     def exceptions(self):
         return self._exceptions[:]
-
     def __getattr__(self, item):
         return getattr(self._function, item)
 
