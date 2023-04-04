@@ -1,5 +1,6 @@
 from db import Base
 import sqlalchemy as q
+from sqlalchemy.orm import relationship
 
 class SubscriptionVariantDatabaseModel(Base):
     __tablename__ = 'subscription_variants'
@@ -16,5 +17,7 @@ class SubscriptionVariantDatabaseModel(Base):
     groups_limit = q.Column(q.Integer, nullable=False)
     vip_groups = q.Column(q.Boolean, default=False, nullable=False)
     unlimited = q.Column(q.Boolean, default=False, nullable=False)
+
+    subscriptions = relationship('SubscriptionDatabaseModel', back_populates='variant')
 
 

@@ -17,9 +17,9 @@ class GroupHistoryDatabaseModel(Base):
     __tablename__ = 'group_history'
     id = q.Column(q.Integer, primary_key=True, index=True)
     group_id = q.Column(q.Integer, q.ForeignKey('groups.id'))
-    group = relationship('GroupDatabaseModel', backref='history')
+    group = relationship('GroupDatabaseModel', back_populates='history')
     user_id = q.Column(q.Integer, q.ForeignKey('users.id'))
-    user = relationship('UserDatabaseModel', backref='group_history')
+    user = relationship('UserDatabaseModel', back_populates='actions')
     action = q.Column(q.Enum(GroupAction), default=GroupAction.PAYMENT)
     action_description = q.Column(q.JSON, nullable=False)
     time = q.Column(q.DateTime, nullable=False, server_default=q.func.now())

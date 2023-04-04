@@ -1,5 +1,11 @@
 from utils.response import ResponseException
 
+# Config
+
+class WrongConfigurationException(ResponseException):
+    META = dict(status_code=500, detail='Ошибка конфигурации')
+
+
 # Authorization
 class AuthorizationException(ResponseException):
     META = dict(status_code=401)
@@ -57,3 +63,15 @@ class AttachmentServiceDeniedException(AttachmentsException):
 
 class AvatarAlreadyExistsException(AttachmentsException):
     META = dict(detail='У вас уже есть аватар')
+
+
+# Groups
+
+class GroupsException(ResponseException):
+    META = dict(status_code=401, detail='Ошибка модуля групп')
+
+class GroupsCreateLimitException(GroupsException):
+    META = dict(detail='Превышен лимит создания групп')
+
+class UserAlreadyInGroupException(ResponseException):
+    META = dict(detail='Пользователь уже находится в этой группе')

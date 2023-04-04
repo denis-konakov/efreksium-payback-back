@@ -22,6 +22,9 @@ class Base(T):
     __abstract__ = True
     def session(self) -> Session:
         return SessionLocal.object_session(self)
+    @classmethod
+    def table(cls) -> str:
+        return cls.__tablename__
 __all__ = (
     'SessionLocal',
     'Base',
