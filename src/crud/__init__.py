@@ -15,4 +15,5 @@ GroupHistoryEntry.update_forward_refs(**deps)
 from .user import *
 from .friends import *
 from .attachments.models import *
+from .group import *
 

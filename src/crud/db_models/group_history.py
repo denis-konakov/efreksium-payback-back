@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from enum import StrEnum
 
 class GroupAction(StrEnum):
+    CREATE = 'create'
     PAYMENT = 'payment'
     ADD_MEMBER = 'add_member'
     REMOVE_MEMBER = 'remove_member'
@@ -15,11 +16,22 @@ class GroupAction(StrEnum):
 
 class GroupHistoryDatabaseModel(Base):
     __tablename__ = 'group_history'
-    id = q.Column(q.Integer, primary_key=True, index=True)
-    group_id = q.Column(q.Integer, q.ForeignKey('groups.id'))
-    group = relationship('GroupDatabaseModel', back_populates='history')
-    user_id = q.Column(q.Integer, q.ForeignKey('users.id'))
-    user = relationship('UserDatabaseModel', back_populates='actions')
-    action = q.Column(q.Enum(GroupAction), default=GroupAction.PAYMENT)
-    action_description = q.Column(q.JSON, nullable=False)
-    time = q.Column(q.DateTime, nullable=False, server_default=q.func.now())
+    id = q.Column(q.Integer,
+                  primary_key=True,
+                  index=True)
+    group_id = q.Column(q.Integer,
+                        q.ForeignKey('group.id'))
+    group = relationship('GroupDatabaseModel',
+                         back_populates='history')
+    user_id = q.Column(q.Integer,
+                       q.ForeignKey('users.id'))
+    user = relationship('UserDatabaseModel',
+                        foreign_keys=['group_history.user_id'],
+                        back_populates='actions')
+    action = q.Column(q.Enum(GroupAction),
+                      default=GroupAction.PAYMENT)
+    action_description = q.Column(q.JSON,
+                                  nullable=False)
+    time = q.Column(q.DateTime,
+                    nullable=False,
+                    server_default=q.func.now())
