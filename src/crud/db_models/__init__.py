@@ -1,6 +1,6 @@
 from .group import GroupDatabaseModel
 from .group_history import GroupHistoryDatabaseModel, GroupAction
-from .group_member import GroupMemberDatabaseModel, GroupRole
+from .group_member import GroupMemberDatabaseModel, GroupRole, GroupRolePermissions
 from .user import UserDatabaseModel
 from .subscription import SubscriptionDatabaseModel
 from .subscription_variant import SubscriptionVariantDatabaseModel
@@ -15,4 +15,5 @@ __all__ = (
     'FriendDatabaseModel',
     'GroupAction',
     'GroupRole',
+    'GroupRolePermissions',
 )

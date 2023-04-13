@@ -5,6 +5,7 @@ from crud.exceptions import AttachmentServiceDeniedException
 from aiohttp import ClientSession
 from config import Config
 from crud.user import UserDatabaseModel
+from crud.group import GroupDatabaseModel
 from .models import AvatarUploadInfo
 from crud.exceptions import AvatarAlreadyExistsException
 from crud.types import AttachmentID
@@ -26,11 +27,14 @@ class AttachmentsCRUD(CRUDBase):
         _session,
         AttachmentServiceDeniedException,
     ])
-    async def create(cls, user: UserDatabaseModel, flags: dict) -> AvatarUploadInfo:
+    async def create(cls, target: UserDatabaseModel | GroupDatabaseModel, flags: dict) -> AvatarUploadInfo:
+        tid = target.id
+        if isinstance(target, GroupDatabaseModel):
+            tid  = -tid
         try:
             async with cls._session() as session:
                 data = dict(
-                    id=user.id,
+                    id=tid,
                     flags=flags
                 )
                 async with session.post(f'{Config.AttachmentsService.PRIVATE_URL}/create', json=data) as resp:
@@ -44,10 +48,16 @@ class AttachmentsCRUD(CRUDBase):
             raise AttachmentServiceDeniedException()
     @classmethod
     @throws([
+        _session,
+    ])
+    def delete(cls, target: UserDatabaseModel | GroupDatabaseModel):
+        ...
+    @classmethod
+    @throws([
         create,
         AvatarAlreadyExistsException,
     ])
-    async def create_avatar(cls, user: UserDatabaseModel):
+    async def create_user_avatar(cls, user: UserDatabaseModel):
         if user.avatar != AttachmentID.default():
             raise AvatarAlreadyExistsException()
         data = await cls.create(user, {
@@ -56,6 +66,16 @@ class AttachmentsCRUD(CRUDBase):
         user.avatar = data.image_id
         user.session().commit()
         return data
+
+    @classmethod
+    @throws([
+        _session,
+    ])
+    async def delete_user_avatar(cls, user: UserDatabaseModel):
+        ...
+
+
+
 
 
 

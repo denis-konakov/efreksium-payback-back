@@ -56,12 +56,8 @@ class GroupFull(GroupWithHistory):
 
 
 class ChangeBalanceEvent(BaseModel):
-    user_id: int
+    target_id: int
     value: int
-    time: datetime
+    class Config:
+        orm_mode = True
 
-
-class GroupBalanceUpdate(BaseModel):
-    user_id: int
-    group_id: int
-    events: list[ChangeBalanceEvent]

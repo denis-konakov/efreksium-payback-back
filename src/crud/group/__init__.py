@@ -2,16 +2,18 @@ from ..err_proxy import CRUDBase
 from ..db_models import (
     UserDatabaseModel,
     GroupDatabaseModel,
-    GroupRole,
     GroupMemberDatabaseModel,
     GroupHistoryDatabaseModel,
-    GroupAction,
+    GroupRolePermissions,
 )
 from utils import throws
 from sqlalchemy.orm import Session
 from ..types import GroupName
 from crud.exceptions import *
+from crud.friends import FriendsCRUD
 import sqlalchemy as q
+from .models import *
+
 
 
 class GroupCRUD(CRUDBase):
@@ -114,6 +116,7 @@ class GroupCRUD(CRUDBase):
         check_in_group,
         UserAlreadyInGroupException,
         GroupPermissionDeniedException,
+        FriendsCRUD.is_friends,
     ])
     def add_member(cls,
                    db: Session,
@@ -121,10 +124,12 @@ class GroupCRUD(CRUDBase):
                    group: GroupDatabaseModel,
                    user: UserDatabaseModel) -> GroupMemberDatabaseModel:
 
-        if cls.check_in_group(db, initiator, group) != GroupRole.OWNER:
+        if cls.check_in_group(db, initiator, group) != GroupRolePermissions.SET_ROLE:
             raise GroupPermissionDeniedException()
         if cls.check_in_group(db, user, group) is not None:
             raise UserAlreadyInGroupException()
+        if not FriendsCRUD.is_friends(initiator, user):
+            raise GroupPermissionDeniedException()
         cls.record_event(
             db,
             group,
@@ -147,6 +152,8 @@ class GroupCRUD(CRUDBase):
     @throws([
         get_member,
         record_event,
+        check_in_group,
+        GroupPermissionDeniedException,
     ])
     def set_role(cls,
                  db: Session,
@@ -154,6 +161,8 @@ class GroupCRUD(CRUDBase):
                  group: GroupDatabaseModel,
                  user: UserDatabaseModel,
                  role: GroupRole) -> GroupMemberDatabaseModel:
+        if cls.check_in_group(db, user, group) != GroupRolePermissions.SET_ROLE:
+            raise GroupPermissionDeniedException()
         t = cls.get_member(db, group, user)
         cls.record_event(
             db,
@@ -186,3 +195,35 @@ class GroupCRUD(CRUDBase):
         if user is None or cls.check_in_group(db, user, group) is not None:
             return group
         raise GroupPermissionDeniedException()
+
+    @classmethod
+    @throws([
+        UserNotFoundException,
+        GroupPermissionDeniedException,
+    ])
+    def change_balance(cls,
+                       db: Session,
+                       group: GroupDatabaseModel,
+                       user: UserDatabaseModel,
+                       events: list[ChangeBalanceEvent]):
+        if cls.check_in_group(db, user, group) != GroupRolePermissions.CHANGE_BALANCE:
+            raise GroupPermissionDeniedException()
+        members: list[GroupMemberDatabaseModel] = group.members
+        for i in events:
+            member = [j for j in members if j.id == i.target_id]
+            if len(member) != 1:
+                raise UserNotFoundException()
+            member = member[0]
+            cls.record_event(
+                db,
+                group,
+                user,
+                GroupAction.CHANGE_BALANCE,
+                dict(
+                    target_id=i.target_id,
+                    old_balance=member.balance,
+                    new_balance=member.balance + i.value,
+                )
+            )
+            member.balance += i.value
+        db.commit()

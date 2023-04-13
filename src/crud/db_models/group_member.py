@@ -1,13 +1,20 @@
 from db import Base
 import sqlalchemy as q
 from sqlalchemy.orm import relationship
-from enum import StrEnum
-
+from enum import StrEnum, Enum
+from utils import EnumGroup
 
 class GroupRole(StrEnum):
     OWNER = 'owner'
     MODERATOR = 'moder'
     MEMBER = 'member'
+
+_ = EnumGroup
+
+class GroupRolePermissions(EnumGroup[GroupRole], Enum):
+    ADD_MEMBER = _(GroupRole.OWNER, GroupRole.MODERATOR)
+    SET_ROLE = _(GroupRole.OWNER)
+    CHANGE_BALANCE = _(GroupRole.OWNER, GroupRole.MODERATOR)
 
 
 class GroupMemberDatabaseModel(Base):

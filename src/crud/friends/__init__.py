@@ -1,4 +1,6 @@
-from .. import CRUDBase, Session, UserNotFoundException, CannotAddHimselfToFriendsException, UserAlreadyYourFriendException
+from crud.exceptions import *
+from sqlalchemy.orm import Session
+from crud.err_proxy import CRUDBase
 import sqlalchemy as q
 from ..db_models import FriendDatabaseModel, UserDatabaseModel
 from .models import *
@@ -63,5 +65,15 @@ class FriendsCRUD(CRUDBase):
             count=len(friends),
             total=total,
         )
+    @classmethod
+    @throws([
+
+    ])
+    def is_friends(cls, db: Session, user1: UserDatabaseModel, user2: UserDatabaseModel) -> bool:
+        return db.query(FriendDatabaseModel).filter(
+            (FriendDatabaseModel.sender_id == user1.id & FriendDatabaseModel.recipient_id == user2.id) |
+            (FriendDatabaseModel.sender_id == user2.id & FriendDatabaseModel.recipient_id == user1.id) &
+            FriendDatabaseModel.status == True
+        ).limit(1).count() == 1
 
 

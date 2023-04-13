@@ -10,14 +10,14 @@ class GroupList(BaseModel):
 
 resp = HTTPResponseModel.success('Список групп успешно получен', GroupList)
 
-@router.post('/all',
-             summary='Получить список групп',
-             responses={
+@router.get('/all',
+            summary='Получить список групп',
+            responses={
                 **throws.docs([
                     resp,
                     GroupCRUD.get_groups
                 ])
-             })
+            })
 def groups_list(db: Session = Depends(get_db),
                 user: UserDatabaseModel = Depends(get_current_user)) -> GroupList:
     try:
