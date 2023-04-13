@@ -11,29 +11,48 @@ class Group(BaseModel):
     class Config:
         orm_mode = True
 
-
-class GroupMember(BaseModel):
+class GroupMemberShared(BaseModel):
     id: int
     user_id: int
-    user: 'UserPublic'
-    group_id: int
-    group: Group
+    user: 'UserShared'
     role: GroupRole
     balance: int
 
     class Config:
         orm_mode = True
 
+class GroupMember(GroupMemberShared):
+    group_id: int
+    group: Group
+
+    class Config:
+        orm_mode = True
+
+
 
 class GroupHistoryEntry(BaseModel):
     id: int
-    group_id: int
-    group: Group
     user_id: int
-    user: 'UserPublic'
+    user: 'UserShared'
     action: GroupAction
     action_description: dict[str, str]
     time: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class GroupWithHistory(Group):
+    history: list[GroupHistoryEntry]
+
+    class Config:
+        orm_mode = True
+
+class GroupFull(GroupWithHistory):
+    members: list[GroupMemberShared]
+
+    class Config:
+        orm_mode = True
 
 
 class ChangeBalanceEvent(BaseModel):
@@ -41,10 +60,8 @@ class ChangeBalanceEvent(BaseModel):
     value: int
     time: datetime
 
+
 class GroupBalanceUpdate(BaseModel):
     user_id: int
     group_id: int
     events: list[ChangeBalanceEvent]
-
-
-

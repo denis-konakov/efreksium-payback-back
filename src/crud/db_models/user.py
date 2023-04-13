@@ -27,7 +27,7 @@ class UserDatabaseModel(Base):
 
     subscriptions = relationship('SubscriptionDatabaseModel', back_populates='user')
 
-    groups = relationship('GroupMemberDatabaseModel', back_populates='user')
+    member_in_groups = relationship('GroupMemberDatabaseModel', back_populates='user')
 
     actions = relationship('GroupHistoryDatabaseModel', back_populates='user')
 
@@ -43,10 +43,17 @@ class UserDatabaseModel(Base):
                 SubscriptionVariantDatabaseModel.default == True
             ).limit(1)
         ).limit(1)).first()
-        if t is None or len(t) != 1:
-            raise WrongConfigurationException
+        if t is None:
+            raise WrongConfigurationException()
         r: SubscriptionVariantDatabaseModel = self.session()\
             .query(SubscriptionVariantDatabaseModel)\
             .filter(SubscriptionVariantDatabaseModel.id == t[0])\
             .first()
         return r
+
+    @cached_property
+    def groups(self):
+        return [
+            i.group
+            for i in self.member_in_groups
+        ]

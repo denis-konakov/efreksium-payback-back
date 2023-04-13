@@ -5,14 +5,29 @@ from ..db_models import (
     GroupRole,
     GroupMemberDatabaseModel,
     GroupHistoryDatabaseModel,
-    GroupAction
+    GroupAction,
 )
 from utils import throws
 from sqlalchemy.orm import Session
 from ..types import GroupName
 from crud.exceptions import *
 import sqlalchemy as q
+
+
 class GroupCRUD(CRUDBase):
+    @classmethod
+    @throws([
+
+    ])
+    def check_in_group(cls, db: Session, user: UserDatabaseModel, group: GroupDatabaseModel) -> GroupRole | None:
+        t: GroupMemberDatabaseModel = db.query(GroupMemberDatabaseModel).filter(q.and_(
+            GroupMemberDatabaseModel.user_id == user.id,
+            GroupMemberDatabaseModel.group_id == group.id
+        )).limit(1).first()
+        if t is None:
+            return None
+        return t.role
+
     @classmethod
     @throws([
 
@@ -33,6 +48,7 @@ class GroupCRUD(CRUDBase):
         db.commit()
         db.refresh(t)
         return t
+
     @classmethod
     @throws([
         GroupsCreateLimitException,
@@ -43,7 +59,7 @@ class GroupCRUD(CRUDBase):
                user: UserDatabaseModel,
                name: GroupName) -> GroupDatabaseModel:
         limit = user.subscription.groups_limit
-        if len(cls.get_members(db, user)) >= limit:
+        if len(cls.get_groups(db, user)) >= limit:
             raise GroupsCreateLimitException()
         g = GroupDatabaseModel(
             name=name,
@@ -65,16 +81,18 @@ class GroupCRUD(CRUDBase):
         )
         db.commit()
         return g
+
     @classmethod
     @throws([
 
     ])
-    def get_members(cls,
-                    db: Session,
-                    user: UserDatabaseModel) -> list[GroupMemberDatabaseModel]:
+    def get_groups(cls,
+                   db: Session,
+                   user: UserDatabaseModel) -> list[GroupMemberDatabaseModel]:
         return db.query(GroupMemberDatabaseModel).where(
             GroupMemberDatabaseModel.user_id == user.id
         ).all()
+
     @classmethod
     @throws([
         UserNotFoundException,
@@ -90,20 +108,22 @@ class GroupCRUD(CRUDBase):
         if t is None:
             raise UserNotFoundException()
         return t
+
     @classmethod
     @throws([
+        check_in_group,
         UserAlreadyInGroupException,
+        GroupPermissionDeniedException,
     ])
     def add_member(cls,
                    db: Session,
                    initiator: UserDatabaseModel,
                    group: GroupDatabaseModel,
                    user: UserDatabaseModel) -> GroupMemberDatabaseModel:
-        t = db.query(GroupMemberDatabaseModel).filter(q.and_(
-            GroupMemberDatabaseModel.user_id == user.id,
-            GroupMemberDatabaseModel.group_id == group.id
-        )).limit(1).count() == 0
-        if not t:
+
+        if cls.check_in_group(db, initiator, group) != GroupRole.OWNER:
+            raise GroupPermissionDeniedException()
+        if cls.check_in_group(db, user, group) is not None:
             raise UserAlreadyInGroupException()
         cls.record_event(
             db,
@@ -122,6 +142,7 @@ class GroupCRUD(CRUDBase):
         db.commit()
         db.refresh(gm)
         return gm
+
     @classmethod
     @throws([
         get_member,
@@ -150,3 +171,18 @@ class GroupCRUD(CRUDBase):
         db.refresh(t)
         return t
 
+    @classmethod
+    @throws([
+        check_in_group,
+        GroupNotFoundException,
+        GroupPermissionDeniedException,
+    ])
+    def get(cls, db: Session, group_id: int, user: UserDatabaseModel | None = None) -> GroupDatabaseModel:
+        group = db.query(GroupDatabaseModel).filter(
+            GroupDatabaseModel.id == group_id
+        ).first()
+        if group is None:
+            raise GroupNotFoundException()
+        if user is None or cls.check_in_group(db, user, group) is not None:
+            return group
+        raise GroupPermissionDeniedException()

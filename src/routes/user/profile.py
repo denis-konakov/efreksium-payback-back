@@ -1,12 +1,12 @@
 from fastapi import Depends
 from depends import get_current_user
-from crud import UserPublic, UserDatabaseModel
+from crud import UserDatabaseModel, UserPublicWithGroups, GroupDatabaseModel
 from . import router
 from utils.throws import throws
 from utils import HTTPResponseModel
 resp = HTTPResponseModel.success(
     'Получение данных пользователя',
-    UserPublic
+    UserPublicWithGroups
 )
 @router.get(
     '/profile',
@@ -18,7 +18,7 @@ resp = HTTPResponseModel.success(
         ]),
     }
 )
-def profile(user: UserDatabaseModel = Depends(get_current_user)) -> UserPublic:
+def profile(user: UserDatabaseModel = Depends(get_current_user)) -> UserPublicWithGroups:
     return resp.response(
-        UserPublic.from_orm(user)
+        UserPublicWithGroups.from_orm(user)
     )

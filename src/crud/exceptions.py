@@ -1,5 +1,11 @@
 from utils.response import ResponseException
 
+# Base
+
+class PermissionDeniedException(ResponseException):
+    META = dict(status_code=403, detail='У вас недостаточно прав для выполнения этого действия')
+
+
 # Config
 
 class WrongConfigurationException(ResponseException):
@@ -35,14 +41,17 @@ class TokenDecodeException(InvalidTokenException):
     pass
 class TokenExpiredException(InvalidTokenException):
     pass
+
+
 # Email
 
 class EmailSendMessageException(ResponseException):
     META = dict(detail='Ошибка отправки письма')
 
+
 # Friends
 class FriendException(ResponseException):
-    META = dict(status_code=401)
+    META = dict(status_code=400)
 
 class AddFriendException(ResponseException):
     META = dict(detail='Ошибка при добавлении пользователя в друзья')
@@ -53,25 +62,32 @@ class CannotAddHimselfToFriendsException(AddFriendException):
 class UserAlreadyYourFriendException(AddFriendException):
     META = dict(detail='Этот пользователь уже у вас в друзьях')
 
+
 # Attachments
 
 class AttachmentsException(ResponseException):
-    META = dict(status_code=401, detail='Ошибка взаимодействия с вложениями')
+    META = dict(status_code=500, detail='Ошибка взаимодействия с вложениями')
 
 class AttachmentServiceDeniedException(AttachmentsException):
     META = dict(detail='Ошибка взаимодействия с сервисом вложений')
 
 class AvatarAlreadyExistsException(AttachmentsException):
-    META = dict(detail='У вас уже есть аватар')
+    META = dict(status_code=400, detail='У вас уже есть аватар')
 
 
 # Groups
 
 class GroupsException(ResponseException):
-    META = dict(status_code=401, detail='Ошибка модуля групп')
+    META = dict(status_code=400, detail='Ошибка модуля групп')
 
 class GroupsCreateLimitException(GroupsException):
     META = dict(detail='Превышен лимит создания групп')
 
-class UserAlreadyInGroupException(ResponseException):
+class UserAlreadyInGroupException(GroupsException):
     META = dict(detail='Пользователь уже находится в этой группе')
+
+class GroupNotFoundException(GroupsException):
+    META = dict(detail='Данной группы не существует', status_code=404)
+
+class GroupPermissionDeniedException(PermissionDeniedException, GroupsException):
+    pass

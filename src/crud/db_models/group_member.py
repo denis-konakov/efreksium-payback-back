@@ -14,7 +14,7 @@ class GroupMemberDatabaseModel(Base):
     __tablename__ = 'group_members'
     id = q.Column(q.Integer, primary_key=True, index=True)
     user_id = q.Column(q.Integer, q.ForeignKey('users.id'))
-    user = relationship('UserDatabaseModel', back_populates='group')
+    user = relationship('UserDatabaseModel', back_populates='member_in_groups')
     group_id = q.Column(q.Integer, q.ForeignKey('group.id'))
     group = relationship('GroupDatabaseModel', back_populates='members')
     role = q.Column(q.Enum(GroupRole), default=GroupRole.MEMBER)

@@ -26,7 +26,7 @@ class GroupHistoryDatabaseModel(Base):
     user_id = q.Column(q.Integer,
                        q.ForeignKey('users.id'))
     user = relationship('UserDatabaseModel',
-                        foreign_keys=['group_history.user_id'],
+                        foreign_keys=[user_id],
                         back_populates='actions')
     action = q.Column(q.Enum(GroupAction),
                       default=GroupAction.PAYMENT)
