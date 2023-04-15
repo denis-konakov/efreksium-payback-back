@@ -32,7 +32,6 @@ deps = {
     'list[GroupFull]': list[GroupFull],
     'GroupFull': GroupFull,
 }
-kdeps = list(deps.keys())
 ls = list(locals().values())
 for i in ls:
     if type(i) != pydantic.main.ModelMetaclass:
