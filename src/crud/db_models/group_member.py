@@ -15,6 +15,7 @@ class GroupRolePermissions(EnumGroup[GroupRole], Enum):
     ADD_MEMBER = _(GroupRole.OWNER, GroupRole.MODERATOR)
     SET_ROLE = _(GroupRole.OWNER)
     CHANGE_BALANCE = _(GroupRole.OWNER, GroupRole.MODERATOR)
+    CHANGE_AVATAR = _(GroupRole.OWNER)
 
 
 class GroupMemberDatabaseModel(Base):

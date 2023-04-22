@@ -74,6 +74,8 @@ class AttachmentServiceDeniedException(AttachmentsException):
 class AvatarAlreadyExistsException(AttachmentsException):
     META = dict(status_code=400, detail='У вас уже есть аватар')
 
+class AvatarDontExistsException(AttachmentsException):
+    META = dict(status_code=404, detail='Аватар не установлен')
 
 # Groups
 

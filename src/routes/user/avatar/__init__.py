@@ -4,4 +4,3 @@ router = APIRouter(prefix='/avatar', tags=['avatar'])
 
 from . import create
 from . import delete
-from . import change

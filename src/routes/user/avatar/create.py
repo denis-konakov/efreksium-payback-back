@@ -1,4 +1,4 @@
-from routes.user import router
+from . import router
 from utils import throws, HTTPResponseModel, ResponseException
 from crud import AttachmentsCRUD, AvatarUploadInfo
 from depends import Depends, get_current_user, UserDatabaseModel
