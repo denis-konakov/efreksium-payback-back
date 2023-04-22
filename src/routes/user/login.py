@@ -20,11 +20,11 @@ resp = HTTPResponseModel.success('Авторизация прошла успеш
                      resp,
                  ]),
              })
-def login(form: OAuth2PasswordRequestForm = Depends(),
+def login(body: UserAuthorizationForm,
           db: Session = Depends(get_db)) -> TokenModel:
     try:
 
-        user = UserCRUD.login(db, UserAuthorizationForm(email=cast(form.username, EmailStr), password=form.password))
+        user = UserCRUD.login(db, body)
         if not user.email_confirmed:
             raise UserNotActiveException.get()
         token = UserCRUD.generate_token(user)
