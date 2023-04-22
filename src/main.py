@@ -50,3 +50,16 @@ def validation_exception_handler(request: fastapi.Request, exc: RequestValidatio
 @app.exception_handler(ResponseException)
 async def response_exception_handler(request: fastapi.Request, exc: ResponseException):
     return await http_exception_handler(request, exc.get())
+
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        Config.Settings.CORS_ORIGINS,
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

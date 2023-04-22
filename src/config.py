@@ -26,6 +26,7 @@ class Config:
     class Settings:
         TOKEN_EXPIRE_INTERVAL: int | timedelta = timedelta(days=7)
         ROOT_PATH:             str = normpath(os.getenv('ROOT_PATH', '/'))
+        CORS_ORIGINS:          str = os.getenv('CORS_ORIGINS', '*').split(',')
     class Email:
         __prefix = 'EMAIL_'
         ENABLED:            bool = bool(os.getenv(f'{__prefix}ENABLED', False))
