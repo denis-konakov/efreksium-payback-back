@@ -86,7 +86,7 @@ class FriendsCRUD(CRUDBase):
     ])
     def user_accepted_friends(cls, db: Session, user: UserDatabaseModel) -> list[UserDatabaseModel]:
         return db.query(UserDatabaseModel).filter(
-            ((UserDatabaseModel.id == FriendDatabaseModel.sender_id & FriendDatabaseModel.recipient_id == user.id) |
-             (UserDatabaseModel.id == FriendDatabaseModel.recipient_id & FriendDatabaseModel.sender_id == user.id)) &
-            FriendDatabaseModel.status == True
+            (((UserDatabaseModel.id == FriendDatabaseModel.sender_id) & (FriendDatabaseModel.recipient_id == user.id)) |
+             ((UserDatabaseModel.id == FriendDatabaseModel.recipient_id) & (FriendDatabaseModel.sender_id == user.id))) &
+            (FriendDatabaseModel.status == True)
         ).all()
