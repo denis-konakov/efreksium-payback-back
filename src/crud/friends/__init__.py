@@ -25,8 +25,8 @@ class FriendsCRUD(CRUDBase):
             raise UserNotFoundException()
 
         invite: FriendDatabaseModel | None = db.query(FriendDatabaseModel).where(q.or_(
-            FriendDatabaseModel.sender_id == sender_id & FriendDatabaseModel.recipient_id == recipient_id,
-            FriendDatabaseModel.sender_id == recipient_id & FriendDatabaseModel.recipient_id == sender_id,
+            (FriendDatabaseModel.sender_id == sender_id) & (FriendDatabaseModel.recipient_id == recipient_id),
+            (FriendDatabaseModel.sender_id == recipient_id) & (FriendDatabaseModel.recipient_id == sender_id),
         )).first()
         if invite is None:
             # Send invite
