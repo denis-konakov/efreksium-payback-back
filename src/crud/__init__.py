@@ -8,7 +8,7 @@ from .user.models import (
     UserAuthorizationForm,
     UserRegistrationForm,
     UserShared,
-    UserPublicWithGroups,
+    UserPublicWithGroupsAndFriends,
 )
 from .subscription.models import (
     SubscriptionInfo,

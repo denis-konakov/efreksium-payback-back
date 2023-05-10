@@ -17,13 +17,14 @@ class UserPublic(UserShared):
     class Config:
         orm_mode = True
 
-class UserPublicWithGroups(UserPublic):
+class UserPublicWithGroupsAndFriends(UserPublic):
     groups: 'list[GroupFull]'
+    friends: list[UserShared]
     class Config:
         orm_mode = True
 
 
-class UserPrivate(UserPublicWithGroups):
+class UserPrivate(UserPublicWithGroupsAndFriends):
     hashed_password: str = Field(title='Хэш пароля')
     email_confirmation_code: str = Field(title='Хеш кода подтверждения')
     password_reset_code: str = Field(title='Хеш кода подтверждения для смены пароля')

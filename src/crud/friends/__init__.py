@@ -5,6 +5,8 @@ import sqlalchemy as q
 from ..db_models import FriendDatabaseModel, UserDatabaseModel
 from .models import *
 from utils import throws, PaginateContent, PaginateContentParams
+
+
 class FriendsCRUD(CRUDBase):
     @classmethod
     @throws([
@@ -39,6 +41,7 @@ class FriendsCRUD(CRUDBase):
         db.commit()
         db.refresh(invite)
         return invite
+
     @classmethod
     @throws([
 
@@ -53,11 +56,11 @@ class FriendsCRUD(CRUDBase):
                 FriendDatabaseModel.recipient_id == user.id
             )
         )
-        friends = db.query(FriendDatabaseModel)\
-            .where(crit)\
-            .order_by(FriendDatabaseModel.id)\
-            .limit(page.count)\
-            .offset(page.offset)\
+        friends = db.query(FriendDatabaseModel) \
+            .where(crit) \
+            .order_by(FriendDatabaseModel.id) \
+            .limit(page.count) \
+            .offset(page.offset) \
             .all()
         total = db.query(FriendDatabaseModel).where(crit).count()
         return PaginateContent[FriendDatabaseModel](
@@ -65,6 +68,7 @@ class FriendsCRUD(CRUDBase):
             count=len(friends),
             total=total,
         )
+
     @classmethod
     @throws([
 
@@ -76,4 +80,13 @@ class FriendsCRUD(CRUDBase):
             FriendDatabaseModel.status == True
         ).limit(1).count() == 1
 
+    @classmethod
+    @throws([
 
+    ])
+    def user_accepted_friends(cls, db: Session, user: UserDatabaseModel) -> list[UserDatabaseModel]:
+        return db.query(UserDatabaseModel).filter(
+            ((UserDatabaseModel.id == FriendDatabaseModel.sender_id & FriendDatabaseModel.recipient_id == user.id) |
+             (UserDatabaseModel.id == FriendDatabaseModel.recipient_id & FriendDatabaseModel.sender_id == user.id)) &
+            FriendDatabaseModel.status == True
+        ).all()
