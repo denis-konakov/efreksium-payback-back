@@ -30,12 +30,14 @@ class FriendsCRUD(CRUDBase):
         )).first()
         if invite is None:
             # Send invite
-            n = FriendDatabaseModel(sender_id=sender_id, recipient_id=recipient_id)
+            n = FriendDatabaseModel(sender_id=sender_id, recipient_id=recipient_id, status=True)
             db.add(n)
             db.commit()
             db.refresh(n)
             return n
         if invite.status:
+            raise UserAlreadyYourFriendException()
+        if sender_id == invite.sender_id:
             raise UserAlreadyYourFriendException()
         invite.status = True
         db.commit()
