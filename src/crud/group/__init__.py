@@ -128,7 +128,7 @@ class GroupCRUD(CRUDBase):
             raise GroupPermissionDeniedException()
         if cls.check_in_group(db, user, group) is not None:
             raise UserAlreadyInGroupException()
-        if not FriendsCRUD.is_friends(initiator, user):
+        if not FriendsCRUD.is_friends(db, initiator, user):
             raise GroupPermissionDeniedException()
         cls.record_event(
             db,
