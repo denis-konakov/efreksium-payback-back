@@ -21,5 +21,6 @@ def add_member(group_id: int, user_id: int,
         adduser = UserCRUD.get(db, id=user_id)
         group = GroupCRUD.get(db, group_id, user)
         GroupCRUD.add_member(db, user, group, adduser)
+        return resp.response()
     except ResponseException as e:
         raise e.get()
