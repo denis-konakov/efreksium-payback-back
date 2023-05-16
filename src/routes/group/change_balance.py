@@ -7,6 +7,7 @@ resp = HTTPResponseModel.success('Баланс участников группы
 @router.post('/change_balance',
              summary='Изменить баланс участников группы',
              responses=throws.docs([
+                resp,
                 GroupCRUD.get,
                 GroupCRUD.change_balance,
                 get_db,
