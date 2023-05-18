@@ -41,6 +41,10 @@ def register(data: UserRegistrationForm,
              mail: MailManager = Depends(get_mail)):
     try:
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 2fbbd5d645757d4e23960c20ae121f8088e56a42
     except UserAlreadyExistsException as e:
         user: UserDatabaseModel = e.additional.get('user')
         if user.email_confirmed:
