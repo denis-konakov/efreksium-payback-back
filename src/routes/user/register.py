@@ -41,16 +41,15 @@ def register(data: UserRegistrationForm,
              mail: MailManager = Depends(get_mail)):
     try:
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
-        if Config.Email.ENABLED:
-            code = UserCRUD.generate_email_confirmation_code(user)
-            print(mail)
-            mail.send_confirmation(user.email, link(code.private), user)
-        return resp.response()
+        
     except UserAlreadyExistsException as e:
         user: UserDatabaseModel = e.additional.get('user')
         if user.email_confirmed:
             raise UserAlreadyExistsException.get()
-        raise UserNotActiveException.get()
+    if Config.Email.ENABLED:
+        code = UserCRUD.generate_email_confirmation_code(user)
+        mail.send_confirmation(user.email, link(code.private), user)
+    return resp.response()
 
 
 
