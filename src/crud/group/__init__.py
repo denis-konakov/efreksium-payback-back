@@ -220,7 +220,7 @@ class GroupCRUD(CRUDBase):
                 user,
                 GroupAction.CHANGE_BALANCE,
                 dict(
-                    target_id=i.target_id,
+                    target_id=member.user_id,
                     old_balance=member.balance,
                     new_balance=member.balance + i.value,
                 )
