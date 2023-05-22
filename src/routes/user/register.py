@@ -46,6 +46,7 @@ def register(data: UserRegistrationForm,
         if user.email_confirmed:
             raise UserAlreadyExistsException.get()
         db.delete(user)
+        db.commit()
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
     if Config.Email.ENABLED:
         code = UserCRUD.generate_email_confirmation_code(user)
