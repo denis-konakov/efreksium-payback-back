@@ -49,7 +49,7 @@ def register(data: UserRegistrationForm,
         db.commit()
         user = UserCRUD.register(db, data, not Config.Email.ENABLED)
     if Config.Email.ENABLED:
-        code = UserCRUD.generate_email_confirmation_code(user)
+        code = UserCRUD.generate_email_confirmation_code(db, user)
         mail.send_confirmation(user.email, link(code.private), user)
     return resp.response()
 

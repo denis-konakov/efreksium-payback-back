@@ -90,12 +90,12 @@ class UserCRUD(CRUDBase):
         _generate_email_code,
     ])
     def generate_email_confirmation_code(cls,
+                                         db: Session,
                                          user: UserDatabaseModel) -> PublicPrivateCodePair:
         code = cls._generate_email_code(EmailStr(user.email))
         if user.email_confirmed:
             raise UserAlreadyExistsException()
         user.email_confirmation_code = code.public
-        db = user.session()
         db.commit()
         db.refresh(user)
         return code
