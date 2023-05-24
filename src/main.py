@@ -1,3 +1,5 @@
+import json
+
 import fastapi
 from fastapi.exceptions import RequestValidationError, ValidationError
 from db import SessionLocal
@@ -39,13 +41,19 @@ app.include_router(router)
 
 @app.exception_handler(RequestValidationError)
 def validation_exception_handler(request: fastapi.Request, exc: RequestValidationError):
-    return fastapi.responses.JSONResponse({
-        'detail': {
+    def parse_obj(a):
+        if isinstance(a, set):
+            return list(a)
+    r = json.loads(json.dumps(
+        {'detail': {
             'status': False,
             'program_code': 'validation_exception',
             'detail': 'Произошла ошибка при валидации входных данных',
             'response': exc.errors()
-        }}, status_code=422)
+        }},
+        default=parse_obj
+    ))
+    return fastapi.responses.JSONResponse(r, status_code=422)
 
 @app.exception_handler(ResponseException)
 async def response_exception_handler(request: fastapi.Request, exc: ResponseException):
